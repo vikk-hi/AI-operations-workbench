@@ -53,6 +53,7 @@ tmp/
 temp/
 .playwright-cli/
 work/
+.worktrees/
 
 # Local browser and session data
 *.cookie.json
