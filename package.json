@@ -32,7 +32,9 @@
     "prepare": "chmod +x .githooks/pre-commit 2>/dev/null; git config core.hooksPath .githooks 2>/dev/null || true",
     "postinstall": "fullstack-cli action-plugin init",
     "dev:local": "node ./scripts/dev-local.js",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "test:bitable": "node --test test/bitable-*.test.mjs",
+    "probe:bitable": "node scripts/probe-bitable.mjs"
   },
   "dependencies": {
     "@lark-apaas/fullstack-nestjs-core": "^1.1.64",
