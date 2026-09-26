@@ -110,6 +110,8 @@ export class WorkbenchService {
       };
     });
     const statusOptions: string[] = [...new Set(summaries.map((task) => task.status))];
+    const sectionOptions: string[] = [...new Set(summaries.map((task) => task.section).filter((value): value is string => Boolean(value)))];
+    const categoryOptions: string[] = [...new Set(summaries.map((task) => task.category).filter((value): value is string => Boolean(value)))];
     const ownerOptions: TaskSummary['responsiblePeople'] = [...new Map(
       summaries.flatMap((task) => task.responsiblePeople).map((person) => [person.id, person]),
     ).values()];
@@ -117,13 +119,15 @@ export class WorkbenchService {
       tasks: summaries,
       viewer,
       statusOptions,
+      sectionOptions,
+      categoryOptions,
       ownerOptions,
       templates: templates.filter((item) => !item.department?.length || item.department.includes('策划')).map((item) => ({
         id: item.baseRecordId ?? item.id, title: item.workItem ?? '未命名事项', frequency: item.frequency ?? null,
         scene: item.workScene ?? null, skills: item.correspondingSkill ?? [],
       })),
       source: {
-        tasksUrl: 'https://qingmutec.feishu.cn/base/O4XhbiUw2aa5yRsgR8fckrNpnXe',
+        tasksUrl: 'https://qingmutec.feishu.cn/base/O4XhbiUw2aa5yRsgR8fckrNpnXe?table=tblyHppWou4Cel1D',
         templatesUrl: 'https://qingmutec.feishu.cn/base/KP2abpA8waP3Nbs3mptcXXMwn9d', readOnly: true, writable: false,
       },
       readStatus: {

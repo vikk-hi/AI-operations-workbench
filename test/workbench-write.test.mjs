@@ -97,3 +97,17 @@ test('reports when stale task choices cannot be refreshed', async () => {
     return true;
   });
 });
+
+test('refreshes changed section and category choices before reporting the conflict', async () => {
+  const codes = ['STALE_SECTION', 'STALE_CATEGORY'];
+  for (const code of codes) {
+    let refreshes = 0;
+    const writer = createWorkbenchWriter({
+      baseUrl: 'http://127.0.0.1:3001',
+      fetchImpl: async () => ({ ok: false, status: 409, async json() { return { error: { kind: 'invalid_task_update', code } }; } }),
+      refresh: async () => { refreshes += 1; },
+    });
+    await assert.rejects(writer('tasks', 'PATCH', 'rec_1', {}), (error) => error.code === code && /重新选择/.test(error.message));
+    assert.equal(refreshes, 1);
+  }
+});

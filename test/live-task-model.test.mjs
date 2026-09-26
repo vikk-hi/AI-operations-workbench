@@ -2,8 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  buildBitableRecordUrl,
   buildTaskPatch,
   createTaskEditDraft,
+  currentSelectChoice,
   filterTasks,
   isTaskComplete,
   reconcileTaskEditDraft,
@@ -45,13 +47,15 @@ test('builds stable filter choices without merging duplicate names', () => {
 test('creates an edit draft and emits only changed task fields', () => {
   const original = tasks[0];
   const draft = createTaskEditDraft(original);
-  assert.deepEqual(draft, { status: '待处理', responsibleOpenIds: ['ou_me'] });
+  assert.deepEqual(draft, { status: '待处理', section: '经营', category: '日报', responsibleOpenIds: ['ou_me'] });
   assert.equal(buildTaskPatch(original, draft), null);
   assert.deepEqual(buildTaskPatch(original, { ...draft, status: '进行中' }), { status: '进行中' });
   assert.deepEqual(buildTaskPatch(original, { ...draft, responsibleOpenIds: ['ou_other', 'ou_me', 'ou_other'] }), {
     responsibleOpenIds: ['ou_me', 'ou_other'],
   });
   assert.deepEqual(buildTaskPatch(original, { ...draft, responsibleOpenIds: [] }), { responsibleOpenIds: [] });
+  assert.deepEqual(buildTaskPatch(original, { ...draft, section: '活动', category: '大促' }), { section: '活动', category: '大促' });
+  assert.deepEqual(buildTaskPatch(original, { ...draft, section: '', category: '' }), { section: null, category: null });
 });
 
 test('reconciles a preserved edit draft against refreshed task choices', () => {
@@ -59,16 +63,41 @@ test('reconciles a preserved edit draft against refreshed task choices', () => {
   const statuses = ['待处理', '进行中', '已完成'];
   const owners = [{ id: 'ou_me', name: '运营甲' }, { id: 'ou_other', name: '运营乙' }];
 
-  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '待处理', responsibleOpenIds: ['ou_me'] }, statuses, owners), {
-    status: '待处理', responsibleOpenIds: ['ou_me'],
+  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '待处理', section: '活动', category: '大促', responsibleOpenIds: ['ou_me'] }, statuses, owners, ['经营', '活动'], ['日报', '大促']), {
+    status: '待处理', section: '活动', category: '大促', responsibleOpenIds: ['ou_me'],
   });
-  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '旧状态', responsibleOpenIds: ['ou_missing'] }, statuses, owners), {
-    status: '进行中', responsibleOpenIds: ['ou_other'],
+  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '旧状态', section: '旧板块', category: '旧分类', responsibleOpenIds: ['ou_missing'] }, statuses, owners, ['经营', '活动'], ['日报', '大促']), {
+    status: '进行中', section: '经营', category: '日报', responsibleOpenIds: ['ou_other'],
   });
-  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '进行中', responsibleOpenIds: ['ou_missing', 'ou_me'] }, statuses, owners), {
-    status: '进行中', responsibleOpenIds: ['ou_me'],
+  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '进行中', section: '', category: '', responsibleOpenIds: ['ou_missing', 'ou_me'] }, statuses, owners, ['经营', '活动'], ['日报', '大促']), {
+    status: '进行中', section: '', category: '', responsibleOpenIds: ['ou_me'],
   });
-  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '进行中', responsibleOpenIds: [] }, statuses, owners), {
-    status: '进行中', responsibleOpenIds: [],
+  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '进行中', section: '经营', category: '日报', responsibleOpenIds: [] }, statuses, owners, ['经营'], ['日报']), {
+    status: '进行中', section: '经营', category: '日报', responsibleOpenIds: [],
   });
+});
+
+test('keeps stale record values separate from current Bitable select options', () => {
+  assert.deepEqual(currentSelectChoice('旧板块', ['经营', '活动', '经营']), {
+    options: ['经营', '活动'],
+    value: '旧板块',
+    stale: true,
+  });
+  assert.deepEqual(currentSelectChoice('经营', ['经营', '活动']), {
+    options: ['经营', '活动'],
+    value: '经营',
+    stale: false,
+  });
+  assert.deepEqual(currentSelectChoice('', ['经营']), {
+    options: ['经营'],
+    value: '',
+    stale: false,
+  });
+});
+
+test('builds a Feishu Bitable link that opens the requested record', () => {
+  assert.equal(
+    buildBitableRecordUrl('https://qingmutec.feishu.cn/base/base_token?table=table_id&view=view_id', 'rec 1'),
+    'https://qingmutec.feishu.cn/base/base_token?table=table_id&view=view_id&record=rec+1',
+  );
 });

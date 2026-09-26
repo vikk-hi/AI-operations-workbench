@@ -109,10 +109,14 @@ test('maps stale task choices and missing records to stable public diagnostics',
 
   const staleStatus = Object.assign(new Error('状态选项已失效'), { kind: 'invalid_task_update', code: 'STALE_STATUS' });
   const staleOwner = Object.assign(new Error('负责人选项已失效'), { kind: 'invalid_task_update', code: 'STALE_OWNER' });
+  const staleSection = Object.assign(new Error('板块选项已失效'), { kind: 'invalid_task_update', code: 'STALE_SECTION' });
+  const staleCategory = Object.assign(new Error('事项分类选项已失效'), { kind: 'invalid_task_update', code: 'STALE_CATEGORY' });
   const missing = Object.assign(new Error('记录不存在'), { kind: 'invalid_task_update', code: 'RECORD_NOT_FOUND' });
   assert.deepEqual(await createApi(staleStatus).handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '旧状态' }), {
     status: 409, body: { error: { kind: 'invalid_task_update', code: 'STALE_STATUS' } },
   });
   assert.equal((await createApi(staleOwner).handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { responsibleOpenIds: ['ou_old'] })).status, 409);
+  assert.equal((await createApi(staleSection).handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { section: '旧板块' })).status, 409);
+  assert.equal((await createApi(staleCategory).handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { category: '旧分类' })).status, 409);
   assert.equal((await createApi(missing).handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '进行中' })).status, 404);
 });

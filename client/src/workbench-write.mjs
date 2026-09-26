@@ -15,6 +15,8 @@ export function createWorkbenchWriter({ baseUrl, fetchImpl = fetch, refresh }) {
       const staleMessages = {
         STALE_STATUS: '状态选项已更新，请重新选择后保存',
         STALE_OWNER: '负责人候选已更新，请重新选择后保存',
+        STALE_SECTION: '板块选项已更新，请重新选择后保存',
+        STALE_CATEGORY: '事项分类选项已更新，请重新选择后保存',
         RECORD_NOT_FOUND: '该任务记录已不存在，请刷新任务列表',
       };
       let refreshStatus = 'not_attempted';

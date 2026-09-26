@@ -49,7 +49,7 @@ export function createWorkbenchApi(repositories, options = {}) {
       } catch (error) {
         const diagnostic = redactedError(error);
         const status = diagnostic.kind === 'verification_mismatch' ? 409
-          : ['STALE_STATUS', 'STALE_OWNER'].includes(diagnostic.code) ? 409
+          : ['STALE_STATUS', 'STALE_OWNER', 'STALE_SECTION', 'STALE_CATEGORY'].includes(diagnostic.code) ? 409
             : diagnostic.code === 'RECORD_NOT_FOUND' ? 404
           : diagnostic.kind === 'forbidden' ? 403
             : error instanceof Error && !('kind' in error) ? 400 : 503;

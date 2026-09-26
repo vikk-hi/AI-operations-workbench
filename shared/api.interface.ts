@@ -53,6 +53,8 @@ export interface TasksDashboardResponse {
   tasks: TaskSummary[];
   templates: TaskTemplateSummary[];
   statusOptions: string[];
+  sectionOptions: string[];
+  categoryOptions: string[];
   ownerOptions: Array<{ id: string; name: string }>;
   source: { tasksUrl: string; templatesUrl: string; readOnly: boolean; writable: boolean };
   viewer: { id: string; name: string; role: 'developer' | 'member' } | null;

@@ -22,6 +22,12 @@ const people = (value) => {
 };
 
 const nonEmptyText = (value) => typeof value === 'string' && value.trim() ? value.trim() : null;
+const optionalSelect = (value, label) => {
+  if (value === null || value === '') return null;
+  const normalized = nonEmptyText(value);
+  if (!normalized) throw new Error(`${label}必须是单选值或空值`);
+  return normalized;
+};
 const selectOptions = (definition) => {
   const options = Array.isArray(definition?.property?.options) ? definition.property.options : [];
   return options.map((option) => nonEmptyText(option?.name)).filter(Boolean);
@@ -82,8 +88,11 @@ export function createTaskRepository({ client, source, now = () => new Date() })
       reader.requireField('任务事项', [1]);
       reader.requireField('负责人', [11]);
       reader.requireField('板块', [3]);
+      reader.requireField('事项分类', [3]);
       reader.requireField('状态', [3]);
       const statusDefinition = definitions.find((definition) => definition.field_name === '状态');
+      const sectionDefinition = definitions.find((definition) => definition.field_name === '板块');
+      const categoryDefinition = definitions.find((definition) => definition.field_name === '事项分类');
       const tasks = records.map((record) => taskFromRecord(record, reader));
       const ownerOptions = [...new Map(tasks.flatMap((task) => task.responsiblePeople).map((person) => [person.id, person])).values()];
       const baseUrl = `https://qingmutec.feishu.cn/base/${source.appToken}?table=${source.tableId}`;
@@ -91,6 +100,8 @@ export function createTaskRepository({ client, source, now = () => new Date() })
         tasks,
         templates: [],
         statusOptions: selectOptions(statusDefinition),
+        sectionOptions: selectOptions(sectionDefinition),
+        categoryOptions: selectOptions(categoryDefinition),
         ownerOptions,
         source: { tasksUrl: baseUrl, templatesUrl: '', readOnly: false, writable: true },
         viewer: viewer ?? null,
@@ -100,9 +111,10 @@ export function createTaskRepository({ client, source, now = () => new Date() })
     async updateTask(id, input) {
       const normalizedId = recordId(id);
       const body = input && typeof input === 'object' && !Array.isArray(input) ? input : {};
-      const unknown = Object.keys(body).filter((key) => !['status', 'responsibleOpenIds'].includes(key));
+      const writableKeys = ['status', 'responsibleOpenIds', 'section', 'category'];
+      const unknown = Object.keys(body).filter((key) => !writableKeys.includes(key));
       if (unknown.length) throw new Error(`不允许更新字段：${unknown.join('、')}`);
-      if (!('status' in body) && !('responsibleOpenIds' in body)) throw new Error('没有可更新的任务字段');
+      if (!writableKeys.some((key) => key in body)) throw new Error('没有可更新的任务字段');
 
       const [definitions, records] = await Promise.all([
         client.listFields(source.appToken, source.tableId),
@@ -114,13 +126,20 @@ export function createTaskRepository({ client, source, now = () => new Date() })
       reader.requireField('任务事项', [1]);
       reader.requireField('负责人', [11]);
       reader.requireField('板块', [3]);
+      reader.requireField('事项分类', [3]);
       reader.requireField('状态', [3]);
       const statusDefinition = definitions.find((definition) => definition.field_name === '状态');
+      const sectionDefinition = definitions.find((definition) => definition.field_name === '板块');
+      const categoryDefinition = definitions.find((definition) => definition.field_name === '事项分类');
       const validStatuses = new Set(selectOptions(statusDefinition));
+      const validSections = new Set(selectOptions(sectionDefinition));
+      const validCategories = new Set(selectOptions(categoryDefinition));
       const validOwnerIds = new Set(records.flatMap((record) => people(record.fields?.负责人).map((person) => person.id)));
       const fields = {};
       let expectedStatus;
       let expectedOwnerIds;
+      let expectedSection;
+      let expectedCategory;
 
       if ('status' in body) {
         expectedStatus = nonEmptyText(body.status);
@@ -133,6 +152,16 @@ export function createTaskRepository({ client, source, now = () => new Date() })
         if (expectedOwnerIds.some((ownerId) => !validOwnerIds.has(ownerId))) throw new TaskUpdateError('STALE_OWNER', '负责人选项已失效，请刷新后重新选择');
         fields.负责人 = expectedOwnerIds.map((ownerId) => ({ id: ownerId }));
       }
+      if ('section' in body) {
+        expectedSection = optionalSelect(body.section, '板块');
+        if (expectedSection !== null && !validSections.has(expectedSection)) throw new TaskUpdateError('STALE_SECTION', '板块选项已失效，请刷新后重新选择');
+        fields.板块 = expectedSection;
+      }
+      if ('category' in body) {
+        expectedCategory = optionalSelect(body.category, '事项分类');
+        if (expectedCategory !== null && !validCategories.has(expectedCategory)) throw new TaskUpdateError('STALE_CATEGORY', '事项分类选项已失效，请刷新后重新选择');
+        fields.事项分类 = expectedCategory;
+      }
 
       await client.updateRecord(source.appToken, source.tableId, normalizedId, fields);
       const freshRecord = await client.getRecord(source.appToken, source.tableId, normalizedId);
@@ -141,7 +170,9 @@ export function createTaskRepository({ client, source, now = () => new Date() })
       const ownerIds = task.responsiblePeople.map((person) => person.id);
       const ownersMatch = expectedOwnerIds === undefined
         || JSON.stringify(sortedIds(ownerIds)) === JSON.stringify(sortedIds(expectedOwnerIds));
-      if (!statusMatches || !ownersMatch) throw new TaskVerificationError();
+      const sectionMatches = expectedSection === undefined || task.section === expectedSection;
+      const categoryMatches = expectedCategory === undefined || task.category === expectedCategory;
+      if (!statusMatches || !ownersMatch || !sectionMatches || !categoryMatches) throw new TaskVerificationError();
       return { recordId: normalizedId, syncStatus: 'verified', task };
     },
   });
