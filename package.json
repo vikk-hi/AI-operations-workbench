@@ -34,7 +34,8 @@
     "dev:local": "node ./scripts/dev-local.js",
     "test": "node --test test/*.test.mjs",
     "test:bitable": "node --test test/bitable-*.test.mjs",
-    "probe:bitable": "node scripts/probe-bitable.mjs"
+    "probe:bitable": "node scripts/probe-bitable.mjs",
+    "verify:bitable": "node scripts/verify-bitable-readonly.mjs"
   },
   "dependencies": {
     "@lark-apaas/fullstack-nestjs-core": "^1.1.64",

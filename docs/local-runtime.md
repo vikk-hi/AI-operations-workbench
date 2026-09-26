@@ -1,52 +1,45 @@
 # Local V9 runtime
 
-## Supported baseline command
+## 启动方式
 
-Install the locked dependencies once:
+安装锁定依赖后运行：
 
 ```bash
 npm ci
+npm run dev:local:web
 ```
 
-Start the credential-free, read-only client baseline:
+打开 `http://127.0.0.1:8080/client/index.html`。本地身份与数据 API 监听 `127.0.0.1:3001`。
+
+`.env.local` 只需保存在项目根目录，包含本机的 `FEISHU_APP_ID` 和 `FEISHU_APP_SECRET`。该文件被 Git 忽略。
+
+## 数据来源
+
+本地页面在 `localhost` 或 `127.0.0.1` 下使用本地 `/api/workbench/*`：
+
+- 核心经营数据：2026 天猫日报
+- 待办事项：工作日报任务
+- 公司目标：QM 目标
+- 活动时间线：大促 TIMELINE
+
+线上妙搭页面继续使用原有 `axiosForBackend`，本地连接不会修改线上行为。
+
+## 权限边界
+
+- 当前连接层只有 GET 请求和只读 Repository。
+- 没有多维表格新增、修改、归档或删除方法。
+- 页面请求失败时显示模块错误，不回退成伪造的真实数据。
+- App Secret、访问令牌和记录字段值不会写入探针报告。
+- 聊天中曾出现过的 App Secret 应在本次联调完成后轮换。
+
+## 验证
 
 ```bash
-npm run dev:client -- --host 127.0.0.1
+npm test
+node --experimental-strip-types --test tests/*.test.ts
+npm run type:check:client
+npm run build:client
+npm run verify:bitable
 ```
 
-Open `http://127.0.0.1:8080/client/index.html` and verify it with:
-
-```bash
-bash scripts/verify-local-runtime.sh
-```
-
-This command intentionally starts only the imported client. It does not run `env pull`, Miaoda app sync, a Feishu write, or a release operation.
-
-## Existing project commands
-
-| Purpose | Existing command | Baseline result |
-| --- | --- | --- |
-| Type check | `npm run type:check` | Passed for client and server |
-| Unit tests | `node --test tests/*.test.ts` | 20 passed, 0 failed; Node emitted module-type performance warnings |
-| Build | `npm run build` | Passed; route-generator downloads were blocked in the sandbox but the script treats them as optional and both client/server builds completed |
-| Client development | `npm run dev:client` | Passed at port 8080 |
-| Server development | `npm run dev:server` | Platform-only without Miaoda environment; see below |
-| Combined platform-aware local mode | `npm run dev:local` | Not used for this baseline because it performs env pull and tool/app synchronization before starting |
-| Lint | `npm run lint` | Available but not required by the baseline plan |
-
-The locked install did not modify `package-lock.json`.
-
-## Platform-only dependencies and local boundaries
-
-| Dependency | Used by | Behavior without Miaoda | Local boundary |
-| --- | --- | --- | --- |
-| `PlatformModule` and platform HTTP client | Nest application bootstrap | Backend exits because `FORCE_AUTHN_INNERAPI_DOMAIN` is absent | Do not start the platform backend in credential-free baseline mode; add a separate local data adapter in the next implementation phase |
-| `DRIZZLE_DATABASE` / DataPaaS | Workbench overview, task, target and timeline APIs | No local database provider exists | Use checked-in read-only snapshots through a local repository adapter; never fake a live sync state |
-| `AuthNPaasService` | Current user and task-owner name resolution | Real identity lookup is unavailable | Display snapshot/unresolved identities and label them as local/read-only |
-| `axiosForBackend` | Client V9 bridge API requests | Requests fail when the platform backend is absent; the bridge emits `hm-live-error` | Existing V9 demo/snapshot runtime remains the degraded UI; a future adapter should provide the same response contracts locally |
-| `showConfirm` | V9 confirmation dialogs | Available from the installed client toolkit; no Feishu write is connected | Keep confirmations local and disable submit/write actions until a reviewed write adapter exists |
-| Miaoda `env pull`, app sync and skills sync | `scripts/dev-local.js` / `scripts/dev.sh` | Would fetch platform environment and mutate local tooling | Excluded from the credential-free baseline command |
-
-## Current baseline meaning
-
-The local client proves that the complete V9 interface and its checked-in snapshot/demo state can run independently. Live multi-dimensional-table reads, real login identity and task-owner resolution still depend on Miaoda services. They are not claimed as locally live, and no writeback is enabled.
+`verify:bitable` 会完整处理分页，但只输出每个来源的字段数和记录数，不输出记录内容。
