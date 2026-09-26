@@ -22,7 +22,23 @@ test('writes an allowlisted module record and refreshes workbench data', async (
   assert.equal(refreshes, 1);
 });
 
-test('rejects unknown modules and reports a signed-out write without refresh', async () => {
+test('rejects every browser write except task PATCH with a record id', async () => {
+  let fetches = 0;
+  const writer = createWorkbenchWriter({
+    baseUrl: 'http://127.0.0.1:3001',
+    fetchImpl: async () => { fetches += 1; return { ok: true, status: 200, async json() { return {}; } }; },
+    refresh: async () => {},
+  });
+
+  await assert.rejects(writer('tasks', 'POST', '', { title: 'A' }), /不允许写入/);
+  await assert.rejects(writer('tasks', 'DELETE', 'rec_1'), /不允许写入/);
+  await assert.rejects(writer('tasks', 'PATCH', '', { status: '进行中' }), /记录 ID/);
+  await assert.rejects(writer('timeline', 'PATCH', 'time_1', { completed: true }), /不允许写入/);
+  await assert.rejects(writer('overview', 'PATCH', 'rec_1', {}), /不允许写入/);
+  assert.equal(fetches, 0);
+});
+
+test('reports a signed-out task update without refresh', async () => {
   let refreshes = 0;
   const writer = createWorkbenchWriter({
     baseUrl: 'http://127.0.0.1:3001',
@@ -30,7 +46,6 @@ test('rejects unknown modules and reports a signed-out write without refresh', a
     refresh: async () => { refreshes += 1; },
   });
 
-  await assert.rejects(writer('overview', 'POST', '', {}), /不允许写入/);
-  await assert.rejects(writer('tasks', 'POST', '', { title: 'A' }), /请先登录/);
+  await assert.rejects(writer('tasks', 'PATCH', 'rec_1', { status: '进行中' }), /请先登录/);
   assert.equal(refreshes, 0);
 });

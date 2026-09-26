@@ -1,12 +1,8 @@
-const WRITABLE_MODULES = new Set(['tasks', 'timeline']);
-const WRITABLE_METHODS = new Set(['POST', 'PATCH', 'DELETE']);
-
 export function createWorkbenchWriter({ baseUrl, fetchImpl = fetch, refresh }) {
   return async (moduleName, method, recordId = '', body = null) => {
-    if (!WRITABLE_MODULES.has(moduleName)) throw new Error('该数据模块不允许写入');
-    if (!WRITABLE_METHODS.has(method)) throw new Error('不支持的写入操作');
-    const suffix = recordId ? `/${encodeURIComponent(recordId)}` : '';
-    const response = await fetchImpl(`${baseUrl}/api/workbench/${moduleName}${suffix}`, {
+    if (moduleName !== 'tasks' || method !== 'PATCH') throw new Error('该数据模块或操作不允许写入');
+    if (typeof recordId !== 'string' || !recordId.trim()) throw new Error('任务记录 ID 不能为空');
+    const response = await fetchImpl(`${baseUrl}/api/workbench/tasks/${encodeURIComponent(recordId.trim())}`, {
       method,
       credentials: 'include',
       headers: body === null ? undefined : { 'content-type': 'application/json' },

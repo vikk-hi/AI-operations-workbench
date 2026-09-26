@@ -17,19 +17,6 @@ export function createWorkbenchApi(repositories, options = {}) {
     '/api/workbench/products': () => Promise.resolve({ status: 'unavailable', coverage: 'none', asOf: null, rows: [], message: '商品明细数据源尚未接入' }),
   };
 
-  const writeRoutes = {
-    tasks: {
-      create: (body, viewer) => repositories.tasks.createTask(body, viewer),
-      update: (id, body, viewer) => repositories.tasks.updateTask(id, body, viewer),
-      remove: (id, viewer) => repositories.tasks.deleteTask(id, viewer),
-    },
-    timeline: {
-      create: (body, viewer) => repositories.timeline.createTimelineItem(body, viewer),
-      update: (id, body, viewer) => repositories.timeline.updateTimelineItem(id, body, viewer),
-      remove: (id, viewer) => repositories.timeline.deleteTimelineItem(id, viewer),
-    },
-  };
-
   const clearModuleCache = (moduleName) => {
     for (const key of cache.keys()) if (key === `/api/workbench/${moduleName}` || key.startsWith(`/api/workbench/${moduleName}:`)) cache.delete(key);
   };
@@ -52,24 +39,19 @@ export function createWorkbenchApi(repositories, options = {}) {
         }
       }
 
-      const match = /^\/api\/workbench\/(tasks|timeline)(?:\/([^/]+))?$/.exec(path);
-      if (!match) return { status: 405, body: { error: 'Method not allowed' } };
+      const match = /^\/api\/workbench\/tasks\/([^/]+)$/.exec(path);
+      if (method !== 'PATCH' || !match) return { status: 405, body: { error: 'Method not allowed' } };
       if (!viewer?.id) return { status: 401, body: { error: '请先使用飞书登录' } };
-      const [, moduleName, encodedId] = match;
-      const id = encodedId ? decodeURIComponent(encodedId) : '';
-      const write = writeRoutes[moduleName];
+      const id = decodeURIComponent(match[1]);
       try {
-        let result;
-        let status = 200;
-        if (method === 'POST' && !id) { result = await write.create(body ?? {}, viewer); status = 201; }
-        else if (method === 'PATCH' && id) result = await write.update(id, body ?? {}, viewer);
-        else if (method === 'DELETE' && id) result = await write.remove(id, viewer);
-        else return { status: 405, body: { error: 'Method not allowed' } };
-        clearModuleCache(moduleName);
-        return { status, body: result };
+        const result = await repositories.tasks.updateTask(id, body ?? {}, viewer);
+        clearModuleCache('tasks');
+        return { status: 200, body: result };
       } catch (error) {
         const diagnostic = redactedError(error);
-        const status = diagnostic.kind === 'forbidden' ? 403 : error instanceof Error && !('kind' in error) ? 400 : 503;
+        const status = diagnostic.kind === 'verification_mismatch' ? 409
+          : diagnostic.kind === 'forbidden' ? 403
+            : error instanceof Error && !('kind' in error) ? 400 : 503;
         return { status, body: { error: diagnostic } };
       }
     },

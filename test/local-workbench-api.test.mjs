@@ -34,45 +34,46 @@ test('isolates one module failure and caches only successful module reads', asyn
   assert.deepEqual(failed.body.error, { kind: 'forbidden', code: 91403 });
 });
 
-test('requires a signed-in viewer and routes task writes with cache invalidation', async () => {
+test('requires login for task PATCH, returns verified data, and invalidates every task cache view', async () => {
   let reads = 0;
+  const verified = { recordId: 'rec_1', syncStatus: 'verified', task: { id: 'rec_1', status: '进行中' } };
   const api = createWorkbenchApi({
     core: { async getOverview() { return {}; } },
     tasks: {
-      async getTasks() { reads += 1; return { tasks: [{ id: String(reads) }] }; },
-      async createTask(body) { return { recordId: `created:${body.title}` }; },
-      async updateTask(id) { return { recordId: id }; },
-      async deleteTask(id) { return { recordId: id, deleted: true }; },
+      async getTasks(viewer) { reads += 1; return { tasks: [{ id: String(reads) }], viewer }; },
+      async updateTask() { return verified; },
     },
     targets: { async getTargets() { return {}; } },
     timeline: { async getTimeline() { return {}; } },
   }, { cacheTtlMs: 5000, now: () => 1000 });
   const viewer = { id: 'ou_1', name: '操作人', role: 'member' };
 
-  assert.equal((await api.handle('POST', '/api/workbench/tasks', null, { title: 'A' })).status, 401);
-  assert.equal((await api.handle('GET', '/api/workbench/tasks', viewer)).body.tasks[0].id, '1');
-  assert.deepEqual(await api.handle('POST', '/api/workbench/tasks', viewer, { title: 'A' }), { status: 201, body: { recordId: 'created:A' } });
+  assert.equal((await api.handle('PATCH', '/api/workbench/tasks/rec_1', null, { status: '进行中' })).status, 401);
+  assert.equal((await api.handle('GET', '/api/workbench/tasks')).body.tasks[0].id, '1');
   assert.equal((await api.handle('GET', '/api/workbench/tasks', viewer)).body.tasks[0].id, '2');
-  assert.deepEqual(await api.handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '进行中' }), { status: 200, body: { recordId: 'rec_1' } });
-  assert.deepEqual(await api.handle('DELETE', '/api/workbench/tasks/rec_1', viewer), { status: 200, body: { recordId: 'rec_1', deleted: true } });
+  assert.deepEqual(await api.handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '进行中' }), { status: 200, body: verified });
+  assert.equal((await api.handle('GET', '/api/workbench/tasks')).body.tasks[0].id, '3');
+  assert.equal((await api.handle('GET', '/api/workbench/tasks', viewer)).body.tasks[0].id, '4');
+  assert.equal((await api.handle('POST', '/api/workbench/tasks', viewer, { title: 'A' })).status, 405);
+  assert.equal((await api.handle('DELETE', '/api/workbench/tasks/rec_1', viewer)).status, 405);
 });
 
-test('routes timeline writes and never exposes a core-data mutation route', async () => {
+test('disables timeline writes and maps safe task update diagnostics', async () => {
+  const mismatch = Object.assign(new Error('secret source details'), { kind: 'verification_mismatch', code: 'READBACK_MISMATCH' });
   const api = createWorkbenchApi({
     core: { async getOverview() { return {}; } },
-    tasks: { async getTasks() { return {}; } },
+    tasks: { async getTasks() { return {}; }, async updateTask() { throw mismatch; } },
     targets: { async getTargets() { return {}; } },
-    timeline: {
-      async getTimeline() { return {}; },
-      async createTimelineItem() { return { recordId: 'time_1' }; },
-      async updateTimelineItem(id) { return { recordId: id }; },
-      async deleteTimelineItem(id) { return { recordId: id, deleted: true }; },
-    },
+    timeline: { async getTimeline() { return {}; } },
   });
   const viewer = { id: 'ou_1', name: '操作人', role: 'member' };
 
-  assert.equal((await api.handle('POST', '/api/workbench/timeline', viewer, { item: '节点' })).status, 201);
-  assert.equal((await api.handle('PATCH', '/api/workbench/timeline/time_1', viewer, { completed: true })).status, 200);
-  assert.equal((await api.handle('DELETE', '/api/workbench/timeline/time_1', viewer)).status, 200);
+  assert.equal((await api.handle('POST', '/api/workbench/timeline', viewer, { item: '节点' })).status, 405);
+  assert.equal((await api.handle('PATCH', '/api/workbench/timeline/time_1', viewer, { completed: true })).status, 405);
+  assert.equal((await api.handle('DELETE', '/api/workbench/timeline/time_1', viewer)).status, 405);
   assert.equal((await api.handle('POST', '/api/workbench/overview', viewer, {})).status, 405);
+  assert.deepEqual(await api.handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '进行中' }), {
+    status: 409,
+    body: { error: { kind: 'verification_mismatch', code: 'READBACK_MISMATCH' } },
+  });
 });

@@ -61,7 +61,7 @@ test('local workbench exposes real Feishu login and logout controls', async () =
   assert.match(adapter, /data-live-act="feishu-logout"/);
 });
 
-test('local preview reads through localhost and exposes the allowlisted writer', async () => {
+test('local preview reads through localhost and exposes only task PATCH writes', async () => {
   const [bridge, writer] = await Promise.all([
     readFile(new URL('../client/src/v9-bridge.ts', import.meta.url), 'utf8'),
     readFile(new URL('../client/src/workbench-write.mjs', import.meta.url), 'utf8'),
@@ -70,7 +70,8 @@ test('local preview reads through localhost and exposes the allowlisted writer',
   assert.match(bridge, /fetch\(`\$\{localAuthBase\}\/api\/workbench/);
   assert.match(bridge, /axiosForBackend/);
   assert.match(bridge, /createWorkbenchWriter/);
-  assert.match(writer, /tasks.*timeline/);
+  assert.match(writer, /moduleName !== 'tasks' \|\| method !== 'PATCH'/);
+  assert.doesNotMatch(writer, /timeline/);
 });
 
 test('combined local launcher binds the client to the documented IPv4 address', async () => {
