@@ -99,10 +99,16 @@ export function createBitableClient({ tokenProvider, fetchImpl = fetch }) {
     return data.record;
   };
 
+  const getRecord = async (appToken, tableId, recordId) => {
+    const data = await request(recordPath(appToken, tableId, recordId));
+    if (!data.record?.record_id) throw new BitableError('malformed_payload', 'MISSING_RECORD', 200);
+    return data.record;
+  };
+
   const deleteRecord = async (appToken, tableId, recordId) => {
     await request(recordPath(appToken, tableId, recordId), { method: 'DELETE' });
     return { recordId, deleted: true };
   };
 
-  return Object.freeze({ listTables, listFields, listAllRecords, listRecordIds, createRecord, updateRecord, deleteRecord });
+  return Object.freeze({ listTables, listFields, listAllRecords, listRecordIds, getRecord, createRecord, updateRecord, deleteRecord });
 }

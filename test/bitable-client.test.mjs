@@ -86,6 +86,34 @@ test('record id probe reads at most three records and returns no field values', 
   assert.match(requestedUrl, /page_size=3/);
 });
 
+test('client reads one record and rejects a missing record payload', async () => {
+  const urls = [];
+  const responses = [
+    json({ code: 0, data: { record: { record_id: 'rec_1', fields: { 状态: '进行中' } } } }),
+    json({ code: 0, data: {} }),
+  ];
+  const client = createBitableClient({
+    tokenProvider: { async getToken() { return 'token'; }, invalidate() {} },
+    fetchImpl: async (url, init) => {
+      urls.push({ url: String(url), method: init.method });
+      return responses.shift();
+    },
+  });
+
+  assert.deepEqual(await client.getRecord('base', 'table', 'rec_1'), {
+    record_id: 'rec_1', fields: { 状态: '进行中' },
+  });
+  assert.deepEqual(urls[0], {
+    url: 'https://open.feishu.cn/open-apis/bitable/v1/apps/base/tables/table/records/rec_1',
+    method: 'GET',
+  });
+  await assert.rejects(client.getRecord('base', 'table', 'rec_missing'), (error) => {
+    assert.equal(error.kind, 'malformed_payload');
+    assert.equal(error.code, 'MISSING_RECORD');
+    return true;
+  });
+});
+
 test('client normalizes rate limits and redacts credentials', async () => {
   const client = createBitableClient({
     tokenProvider: { async getToken() { return 'sensitive-token'; }, invalidate() {} },
