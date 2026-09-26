@@ -22,6 +22,10 @@ const people = (value) => {
 };
 
 const nonEmptyText = (value) => typeof value === 'string' && value.trim() ? value.trim() : null;
+const selectOptions = (definition) => {
+  const options = Array.isArray(definition?.property?.options) ? definition.property.options : [];
+  return options.map((option) => nonEmptyText(option?.name)).filter(Boolean);
+};
 const recordId = (value) => {
   const id = nonEmptyText(value);
   if (!id) throw new Error('记录 ID 不能为空');
@@ -57,6 +61,7 @@ export function createTaskRepository({ client, source, now = () => new Date() })
       reader.requireField('负责人', [11]);
       reader.requireField('板块', [3]);
       reader.requireField('状态', [3]);
+      const statusDefinition = definitions.find((definition) => definition.field_name === '状态');
       const tasks = records.map((record) => {
         const owners = people(record.fields?.负责人);
         const rawOwners = Array.isArray(record.fields?.负责人) ? record.fields.负责人 : [];
@@ -67,16 +72,22 @@ export function createTaskRepository({ client, source, now = () => new Date() })
           startDate: null,
           endDate: null,
           section: textValue(record.fields?.板块),
+          category: textValue(record.fields?.事项分类),
+          subgroup: textValue(record.fields?.子分组),
+          notes: textValue(record.fields?.备注),
           responsiblePerson: owners[0]?.name ?? null,
           responsiblePeople: owners,
           reviewerPeople: [],
           peopleStatus: owners.length > 0 ? 'resolved' : rawOwners.length > 0 ? 'unresolved' : 'unassigned',
         };
       });
+      const ownerOptions = [...new Map(tasks.flatMap((task) => task.responsiblePeople).map((person) => [person.id, person])).values()];
       const baseUrl = `https://qingmutec.feishu.cn/base/${source.appToken}?table=${source.tableId}`;
       return {
         tasks,
         templates: [],
+        statusOptions: selectOptions(statusDefinition),
+        ownerOptions,
         source: { tasksUrl: baseUrl, templatesUrl: '', readOnly: false, writable: true },
         viewer: viewer ?? null,
         readStatus: { sourceKey: source.key, mode: 'live-readwrite', lastReadAt: now().toISOString(), recordCount: records.length, cached: false, warnings: ['任务模板表尚未单独映射'] },

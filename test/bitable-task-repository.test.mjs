@@ -5,19 +5,36 @@ import { createTaskRepository } from '../server-local/repositories/task-reposito
 
 const definitions = [
   ['任务事项', 1], ['负责人', 11], ['板块', 3], ['事项分类', 3], ['子分组', 1], ['状态', 3], ['备注', 1], ['春豌', 21],
-].map(([field_name, type], index) => ({ field_id: `fld_${index}`, field_name, type }));
+].map(([field_name, type], index) => ({
+  field_id: `fld_${index}`,
+  field_name,
+  type,
+  ...(field_name === '状态' ? { property: { options: [{ name: '待处理' }, { name: '进行中' }, { name: '已完成' }] } } : {}),
+}));
 
 test('maps tasks, multiple owners, links, and honest people status', async () => {
   const records = [
-    { record_id: 'rec_1', fields: { 任务事项: '检查日报', 负责人: [{ id: 'ou_1', name: '春豌' }, { id: 'ou_2', name: '榅桲' }], 板块: '经营', 事项分类: '日报', 子分组: '复盘', 状态: '进行中', 春豌: ['linked_1'] } },
-    { record_id: 'rec_2', fields: { 任务事项: '未分派任务', 负责人: [], 状态: '待处理' } },
+    { record_id: 'rec_1', fields: { 任务事项: '检查日报', 负责人: [{ id: 'ou_1', name: '春豌' }, { id: 'ou_2', name: '同名人员' }], 板块: '经营', 事项分类: '日报', 子分组: '复盘', 状态: '进行中', 备注: '核对完整日', 春豌: ['linked_1'] } },
+    { record_id: 'rec_2', fields: { 任务事项: '未分派任务', 负责人: [{ id: 'ou_3', name: '同名人员' }, { id: 'ou_1', name: '春豌' }], 状态: '待处理' } },
   ];
   const repository = createTaskRepository({ source: { key: 'tasks', appToken: 'base', tableId: 'table' }, client: { async listFields() { return definitions; }, async listAllRecords() { return records; } } });
   const result = await repository.getTasks({ id: 'ou_viewer', name: 'Viewer', role: 'member' });
   assert.equal(result.tasks[0].id, 'rec_1');
-  assert.deepEqual(result.tasks[0].responsiblePeople.map((item) => item.name), ['春豌', '榅桲']);
+  assert.deepEqual(result.tasks[0].responsiblePeople.map((item) => item.name), ['春豌', '同名人员']);
   assert.equal(result.tasks[0].peopleStatus, 'resolved');
-  assert.equal(result.tasks[1].peopleStatus, 'unassigned');
+  assert.equal(result.tasks[1].peopleStatus, 'resolved');
+  assert.equal(result.tasks[0].category, '日报');
+  assert.equal(result.tasks[0].subgroup, '复盘');
+  assert.equal(result.tasks[0].notes, '核对完整日');
+  assert.equal(result.tasks[1].category, null);
+  assert.equal(result.tasks[1].subgroup, null);
+  assert.equal(result.tasks[1].notes, null);
+  assert.deepEqual(result.statusOptions, ['待处理', '进行中', '已完成']);
+  assert.deepEqual(result.ownerOptions, [
+    { id: 'ou_1', name: '春豌' },
+    { id: 'ou_2', name: '同名人员' },
+    { id: 'ou_3', name: '同名人员' },
+  ]);
   assert.equal(result.viewer.name, 'Viewer');
   assert.equal(result.source.readOnly, false);
   assert.equal(result.source.writable, true);

@@ -100,22 +100,35 @@ export class WorkbenchService {
         startDate: task.startDate ?? null,
         endDate: task.endDate ?? null,
         section: displayText(task.appSection),
+        category: displayText(task.itemCategory),
+        subgroup: displayText(task.subGroup),
+        notes: null,
         responsiblePerson: linkedOwnerIds[0] ?? null,
         responsiblePeople,
         reviewerPeople: [],
         peopleStatus,
       };
     });
+    const statusOptions: string[] = [...new Set(summaries.map((task) => task.status))];
+    const ownerOptions: TaskSummary['responsiblePeople'] = [...new Map(
+      summaries.flatMap((task) => task.responsiblePeople).map((person) => [person.id, person]),
+    ).values()];
     return {
       tasks: summaries,
       viewer,
+      statusOptions,
+      ownerOptions,
       templates: templates.filter((item) => !item.department?.length || item.department.includes('策划')).map((item) => ({
         id: item.baseRecordId ?? item.id, title: item.workItem ?? '未命名事项', frequency: item.frequency ?? null,
         scene: item.workScene ?? null, skills: item.correspondingSkill ?? [],
       })),
       source: {
         tasksUrl: 'https://qingmutec.feishu.cn/base/O4XhbiUw2aa5yRsgR8fckrNpnXe',
-        templatesUrl: 'https://qingmutec.feishu.cn/base/KP2abpA8waP3Nbs3mptcXXMwn9d', readOnly: true,
+        templatesUrl: 'https://qingmutec.feishu.cn/base/KP2abpA8waP3Nbs3mptcXXMwn9d', readOnly: true, writable: false,
+      },
+      readStatus: {
+        sourceKey: 'miaoda-tasks', mode: 'continuous-sync', lastReadAt: new Date().toISOString(),
+        recordCount: summaries.length, cached: false, warnings: [],
       },
     };
   }

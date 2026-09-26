@@ -32,6 +32,9 @@ export interface TaskSummary {
   startDate: string | null;
   endDate: string | null;
   section: string | null;
+  category: string | null;
+  subgroup: string | null;
+  notes: string | null;
   responsiblePerson: string | null;
   responsiblePeople: Array<{ id: string; name: string }>;
   reviewerPeople: Array<{ id: string; name: string }>;
@@ -49,8 +52,18 @@ export interface TaskTemplateSummary {
 export interface TasksDashboardResponse {
   tasks: TaskSummary[];
   templates: TaskTemplateSummary[];
-  source: { tasksUrl: string; templatesUrl: string; readOnly: true };
+  statusOptions: string[];
+  ownerOptions: Array<{ id: string; name: string }>;
+  source: { tasksUrl: string; templatesUrl: string; readOnly: boolean; writable: boolean };
   viewer: { id: string; name: string; role: 'developer' | 'member' } | null;
+  readStatus: {
+    sourceKey: string;
+    mode: string;
+    lastReadAt: string;
+    recordCount: number;
+    cached: boolean;
+    warnings: string[];
+  };
 }
 
 export interface DataSourceSummary {
