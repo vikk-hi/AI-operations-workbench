@@ -1,5 +1,7 @@
 import http from 'node:http';
 import process from 'node:process';
+import path from 'node:path';
+import { existsSync } from 'node:fs';
 import dotenv from 'dotenv';
 
 import {
@@ -10,14 +12,42 @@ import {
   parseAuthConfig,
   tokenDigest,
 } from './feishu-auth.mjs';
+import { createBitableClient } from './bitable/client.mjs';
+import { loadBitableConfig } from './bitable/config.mjs';
+import { createTokenProvider } from './bitable/token-provider.mjs';
+import { createCoreRepository } from './repositories/core-repository.mjs';
+import { createTaskRepository } from './repositories/task-repository.mjs';
+import { createTargetRepository } from './repositories/target-repository.mjs';
+import { createTimelineRepository } from './repositories/timeline-repository.mjs';
+import { createWorkbenchApi } from './workbench-api.mjs';
 
-dotenv.config({ path: '.env.local' });
+for (const candidate of [path.resolve('.env.local'), path.resolve('../..', '.env.local')]) {
+  if (existsSync(candidate)) { dotenv.config({ path: candidate, quiet: true }); break; }
+}
 dotenv.config({ path: '.env' });
 
 const config = parseAuthConfig();
+const bitableConfig = loadBitableConfig();
 const port = Number(process.env.LOCAL_AUTH_PORT || 3001);
 const sessions = new Map();
 const states = new Map();
+const bitableClient = createBitableClient({ tokenProvider: createTokenProvider(bitableConfig) });
+const workbenchApi = createWorkbenchApi({
+  core: createCoreRepository({ client: bitableClient, source: bitableConfig.sources.core }),
+  tasks: createTaskRepository({ client: bitableClient, source: bitableConfig.sources.tasks }),
+  targets: createTargetRepository({ client: bitableClient, source: bitableConfig.sources.companyTargets }),
+  timeline: createTimelineRepository({ client: bitableClient, source: bitableConfig.sources.timeline }),
+}, {
+  cacheTtlMs: bitableConfig.cacheTtlMs,
+  sources: {
+    sources: Object.values(bitableConfig.sources).filter((source) => source.enabled).map((source) => ({
+      key: source.key, label: source.label,
+      baseUrl: `https://qingmutec.feishu.cn/base/${source.appToken}?table=${source.tableId}`,
+      tableName: source.label, mode: 'continuous-sync', readOnlyOriginal: true,
+    })),
+    replacementRule: '本地通过飞书开放 API 只读访问原始多维表格，不依赖妙搭数据库',
+  },
+});
 
 const cookie = (request, name) => {
   const item = (request.headers.cookie || '').split(';').map((part) => part.trim()).find((part) => part.startsWith(`${name}=`));
@@ -98,6 +128,14 @@ const server = http.createServer(async (request, response) => {
     if (sessionId) sessions.delete(tokenDigest(sessionId));
     response.setHeader('set-cookie', 'hm_feishu_session=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0');
     return json(response, 200, { ok: true }, origin);
+  }
+
+  if (url.pathname.startsWith('/api/workbench/')) {
+    const sessionId = cookie(request, 'hm_feishu_session');
+    const user = sessionId ? sessions.get(tokenDigest(sessionId)) : null;
+    const viewer = user ? { id: user.openId, name: user.name, role: 'member' } : null;
+    const result = await workbenchApi.handle(request.method || 'GET', url.pathname, viewer);
+    return json(response, result.status, result.body, origin);
   }
 
   return json(response, 404, { error: 'Not found' }, origin);

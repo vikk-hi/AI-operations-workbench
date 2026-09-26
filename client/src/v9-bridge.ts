@@ -26,14 +26,16 @@ async function loadLocalFeishuIdentity() {
 
 async function loadWorkbench() {
   try {
+    const requestWorkbench = async (name: string) => {
+      if (!isLocalPreview) return axiosForBackend({ url: `/api/workbench/${name}`, method: 'GET' });
+      const response = await fetch(`${localAuthBase}/api/workbench/${name}`, { credentials: 'include' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(`Local workbench module failed: ${name}`);
+      return { data };
+    };
     const [overview, tasks, sources, categories, products, targets, timeline] = await Promise.all([
-      axiosForBackend({ url: '/api/workbench/overview', method: 'GET' }),
-      axiosForBackend({ url: '/api/workbench/tasks', method: 'GET' }),
-      axiosForBackend({ url: '/api/workbench/sources', method: 'GET' }),
-      axiosForBackend({ url: '/api/workbench/categories', method: 'GET' }),
-      axiosForBackend({ url: '/api/workbench/products', method: 'GET' }),
-      axiosForBackend({ url: '/api/workbench/targets', method: 'GET' }),
-      axiosForBackend({ url: '/api/workbench/timeline', method: 'GET' }),
+      requestWorkbench('overview'), requestWorkbench('tasks'), requestWorkbench('sources'), requestWorkbench('categories'),
+      requestWorkbench('products'), requestWorkbench('targets'), requestWorkbench('timeline'),
     ]);
     window.dispatchEvent(new CustomEvent('hm-live-ready', { detail: {
       overview: overview.data as CoreOverviewResponse,
