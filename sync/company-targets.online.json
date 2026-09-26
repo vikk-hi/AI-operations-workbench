@@ -1,0 +1,12 @@
+{
+  "mode": "streaming",
+  "source": {
+    "type": "base",
+    "base_url": "https://qingmutec.feishu.cn/base/PNlTbnPPdaC4mKsWiulcuYzznHd?table=tbl74NgTMPJdwQXH",
+    "table": { "name": "QM目标" }
+  },
+  "target": {
+    "type": "postgresql",
+    "table": { "name": "hm_company_targets", "action": "use_existing" }
+  }
+}

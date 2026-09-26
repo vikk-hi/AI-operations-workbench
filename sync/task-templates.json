@@ -1,0 +1,17 @@
+{
+  "mode": "streaming",
+  "source": {
+    "type": "base",
+    "base_url": "https://qingmutec.feishu.cn/base/KP2abpA8waP3Nbs3mptcXXMwn9d?table=tblKes4rDW2fQ2Nr",
+    "table": {
+      "name": "🧾 团队工作事项"
+    }
+  },
+  "target": {
+    "type": "postgresql",
+    "table": {
+      "name": "hm_task_templates",
+      "action": "create"
+    }
+  }
+}

@@ -1,0 +1,773 @@
+{
+  "field_maps": [
+    {
+      "base_field": {
+        "name": "表唯一 ID"
+      },
+      "pg_field": {
+        "comment": "表唯一 ID",
+        "name": "id",
+        "nullable": false,
+        "single_value": true,
+        "type": "uuid",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "Base 表记录 ID"
+      },
+      "pg_field": {
+        "comment": "Base 表记录 ID",
+        "name": "base_record_id",
+        "nullable": true,
+        "single_value": true,
+        "type": "varchar",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "Year"
+      },
+      "pg_field": {
+        "comment": "Year",
+        "name": "app_year",
+        "nullable": true,
+        "single_value": true,
+        "type": "text",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "SourceID"
+      },
+      "pg_field": {
+        "comment": "SourceID",
+        "name": "source_id",
+        "nullable": true,
+        "single_value": true,
+        "type": "text",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Year1"
+      },
+      "pg_field": {
+        "comment": "Year1",
+        "name": "year1",
+        "nullable": true,
+        "single_value": true,
+        "type": "text",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Date"
+      },
+      "pg_field": {
+        "comment": "Date",
+        "name": "app_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "text",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Channel"
+      },
+      "pg_field": {
+        "comment": "Channel",
+        "name": "channel",
+        "nullable": true,
+        "single_value": true,
+        "type": "text",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Activity"
+      },
+      "pg_field": {
+        "comment": "Activity",
+        "name": "activity",
+        "nullable": true,
+        "single_value": true,
+        "type": "text",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Target"
+      },
+      "pg_field": {
+        "comment": "Target",
+        "name": "app_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "GMV"
+      },
+      "pg_field": {
+        "comment": "GMV",
+        "name": "gmv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "GMV(Excluding shopping credit)"
+      },
+      "pg_field": {
+        "comment": "GMV(Excluding shopping credit)",
+        "name": "gmv_excl_shopping_credit",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Achieve%"
+      },
+      "pg_field": {
+        "comment": "Achieve%",
+        "name": "achieve_percent",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Refund Amount"
+      },
+      "pg_field": {
+        "comment": "Refund Amount",
+        "name": "refund_amount",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Refund Rate"
+      },
+      "pg_field": {
+        "comment": "Refund Rate",
+        "name": "refund_rate",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "NET"
+      },
+      "pg_field": {
+        "comment": "NET",
+        "name": "net",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "IPV"
+      },
+      "pg_field": {
+        "comment": "IPV",
+        "name": "ipv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "PDP IPV"
+      },
+      "pg_field": {
+        "comment": "PDP IPV",
+        "name": "pdp_ipv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "UV"
+      },
+      "pg_field": {
+        "comment": "UV",
+        "name": "uv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "AOV"
+      },
+      "pg_field": {
+        "comment": "AOV",
+        "name": "aov",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "CVR%"
+      },
+      "pg_field": {
+        "comment": "CVR%",
+        "name": "cvr",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Buyers"
+      },
+      "pg_field": {
+        "comment": "Buyers",
+        "name": "app_buyers",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "GMV Pcs"
+      },
+      "pg_field": {
+        "comment": "GMV Pcs",
+        "name": "gmv_pcs",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "ASP"
+      },
+      "pg_field": {
+        "comment": "ASP",
+        "name": "app_asp",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Parent Order Quantity"
+      },
+      "pg_field": {
+        "comment": "Parent Order Quantity",
+        "name": "parent_order_quantity",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Order Quantity"
+      },
+      "pg_field": {
+        "comment": "Order Quantity",
+        "name": "order_quantity",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Paid Old Buyers"
+      },
+      "pg_field": {
+        "comment": "Paid Old Buyers",
+        "name": "paid_old_buyers",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "ATC"
+      },
+      "pg_field": {
+        "comment": "ATC",
+        "name": "app_atc",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "ATC Pcs"
+      },
+      "pg_field": {
+        "comment": "ATC Pcs",
+        "name": "atc_pcs",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "ATC Rate"
+      },
+      "pg_field": {
+        "comment": "ATC Rate",
+        "name": "atc_rate",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Add-cart Items per Person"
+      },
+      "pg_field": {
+        "comment": "Add-cart Items per Person",
+        "name": "add_cart_items_per_person",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Favorites Count Rate"
+      },
+      "pg_field": {
+        "comment": "Favorites Count Rate",
+        "name": "favorites_count_rate",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Favorites Count"
+      },
+      "pg_field": {
+        "comment": "Favorites Count",
+        "name": "favorites_count",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Avg Stay Duration(s)"
+      },
+      "pg_field": {
+        "comment": "Avg Stay Duration(s)",
+        "name": "avg_stay_duration_s",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Member Join UV"
+      },
+      "pg_field": {
+        "comment": "Member Join UV",
+        "name": "member_join_uv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Member Return UV"
+      },
+      "pg_field": {
+        "comment": "Member Return UV",
+        "name": "member_return_uv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Member Scale"
+      },
+      "pg_field": {
+        "comment": "Member Scale",
+        "name": "member_scale",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Member Buyers"
+      },
+      "pg_field": {
+        "comment": "Member Buyers",
+        "name": "member_buyers",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Member Buyers SOB"
+      },
+      "pg_field": {
+        "comment": "Member Buyers SOB",
+        "name": "member_buyers_sob",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Member GMV"
+      },
+      "pg_field": {
+        "comment": "Member GMV",
+        "name": "member_gmv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Member GMV SOB"
+      },
+      "pg_field": {
+        "comment": "Member GMV SOB",
+        "name": "member_gmv_sob",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Store Level \u0026 Ranking"
+      },
+      "pg_field": {
+        "comment": "Store Level \u0026 Ranking",
+        "name": "store_level_ranking",
+        "nullable": true,
+        "single_value": true,
+        "type": "text",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Shop Performance Score"
+      },
+      "pg_field": {
+        "comment": "Shop Performance Score",
+        "name": "shop_performance_score",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "CPS GMV"
+      },
+      "pg_field": {
+        "comment": "CPS GMV",
+        "name": "cps_gmv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "LS GMV"
+      },
+      "pg_field": {
+        "comment": "LS GMV",
+        "name": "ls_gmv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "LS Buyers"
+      },
+      "pg_field": {
+        "comment": "LS Buyers",
+        "name": "ls_buyers",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "LS AOV"
+      },
+      "pg_field": {
+        "comment": "LS AOV",
+        "name": "ls_aov",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "LS UV"
+      },
+      "pg_field": {
+        "comment": "LS UV",
+        "name": "ls_uv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "LS Member Join UV"
+      },
+      "pg_field": {
+        "comment": "LS Member Join UV",
+        "name": "ls_member_join_uv",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "客单价目标"
+      },
+      "pg_field": {
+        "comment": "客单价目标",
+        "name": "unit_price_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "转化率目标"
+      },
+      "pg_field": {
+        "comment": "转化率目标",
+        "name": "conversion_rate_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "件单价目标"
+      },
+      "pg_field": {
+        "comment": "件单价目标",
+        "name": "item_unit_price_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "Net净销额目标"
+      },
+      "pg_field": {
+        "comment": "Net净销额目标",
+        "name": "net_sales_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "排名"
+      },
+      "pg_field": {
+        "comment": "排名",
+        "name": "app_rank",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "活动期"
+      },
+      "pg_field": {
+        "comment": "活动期",
+        "name": "activity_period",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建时间"
+      },
+      "pg_field": {
+        "comment": "创建时间",
+        "name": "_created_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建人"
+      },
+      "pg_field": {
+        "comment": "创建人",
+        "name": "_created_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新时间"
+      },
+      "pg_field": {
+        "comment": "更新时间",
+        "name": "_updated_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新人"
+      },
+      "pg_field": {
+        "comment": "更新人",
+        "name": "_updated_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    }
+  ],
+  "mode": "streaming",
+  "source": {
+    "base_url": "https://qingmutec.feishu.cn/base/M1z2bWhVhahRlDsBUG1cDQUwnRg?table=tblxTrxDK5lGJxlo",
+    "table": {
+      "name": "2026天猫日报"
+    },
+    "type": "base"
+  },
+  "target": {
+    "table": {
+      "action": "use_existing",
+      "name": "hm_core_metrics"
+    },
+    "type": "postgresql"
+  }
+}

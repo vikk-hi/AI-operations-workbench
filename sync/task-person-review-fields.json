@@ -1,0 +1,15 @@
+[
+  { "name": "工作台任务编号", "type": "text" },
+  { "name": "执行结果", "type": "text" },
+  { "name": "成果文件链接", "type": "text" },
+  { "name": "指定审核人", "type": "user" },
+  { "name": "工作台审核状态", "type": "select", "multiple": false, "options": [
+    { "name": "待执行" }, { "name": "待补交" }, { "name": "已提交、待确认" },
+    { "name": "已退回" }, { "name": "审核通过" }, { "name": "待同步" }
+  ] },
+  { "name": "审核意见", "type": "text" },
+  { "name": "后续行动建议", "type": "text" },
+  { "name": "回看计划", "type": "text" },
+  { "name": "提交时间", "type": "datetime" },
+  { "name": "审核时间", "type": "datetime" }
+]

@@ -1,0 +1,12 @@
+{
+  "mode": "streaming",
+  "source": {
+    "type": "base",
+    "base_url": "https://qingmutec.feishu.cn/base/M1z2bWhVhahRlDsBUG1cDQUwnRg?table=tblPCKtYMyuuquPu",
+    "table": { "name": "biz plan目标" }
+  },
+  "target": {
+    "type": "postgresql",
+    "table": { "name": "hm_brand_targets", "action": "create" }
+  }
+}

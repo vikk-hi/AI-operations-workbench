@@ -1,0 +1,751 @@
+{
+  "field_maps": [
+    {
+      "base_field": {
+        "name": "表唯一 ID"
+      },
+      "pg_field": {
+        "comment": "表唯一 ID",
+        "name": "id",
+        "nullable": false,
+        "single_value": true,
+        "type": "uuid",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "Base 表记录 ID"
+      },
+      "pg_field": {
+        "comment": "Base 表记录 ID",
+        "name": "base_record_id",
+        "nullable": true,
+        "single_value": true,
+        "type": "varchar",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "工作项"
+      },
+      "pg_field": {
+        "comment": "工作项",
+        "name": "work_item",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "编号"
+      },
+      "pg_field": {
+        "comment": "编号",
+        "name": "app_id",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "工作流"
+      },
+      "option_mappings": [
+        {
+          "source": "1 目标与规划",
+          "target": "1 目标与规划"
+        },
+        {
+          "source": "2 货盘管理",
+          "target": "2 货盘管理"
+        },
+        {
+          "source": "3 店铺与页面",
+          "target": "3 店铺与页面"
+        },
+        {
+          "source": "4 价格与活动",
+          "target": "4 价格与活动"
+        },
+        {
+          "source": "5 流量与推广",
+          "target": "5 流量与推广"
+        },
+        {
+          "source": "6 人群与会员",
+          "target": "6 人群与会员"
+        },
+        {
+          "source": "7 数据与复盘",
+          "target": "7 数据与复盘"
+        },
+        {
+          "source": "8 服务与体验",
+          "target": "8 服务与体验"
+        },
+        {
+          "source": "9 经营管理与保障(自定义)",
+          "target": "9 经营管理与保障(自定义)"
+        },
+        {
+          "source": "10. 行业信息分享",
+          "target": "10. 行业信息分享"
+        }
+      ],
+      "pg_field": {
+        "comment": "工作流",
+        "name": "work_flow",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "核心环节"
+      },
+      "option_mappings": [
+        {
+          "source": "1.1 年度目标拆解",
+          "target": "1.1 年度目标拆解"
+        },
+        {
+          "source": "1.2 月度目标拆解及预测",
+          "target": "1.2 月度目标拆解及预测"
+        },
+        {
+          "source": "1.3 月度时间线规划",
+          "target": "1.3 月度时间线规划"
+        },
+        {
+          "source": "2.1 商品资料/卖点收集",
+          "target": "2.1 商品资料/卖点收集"
+        },
+        {
+          "source": "2.2 上新与PDP制作",
+          "target": "2.2 上新与PDP制作"
+        },
+        {
+          "source": "2.3 商品链接维护",
+          "target": "2.3 商品链接维护"
+        },
+        {
+          "source": "2.4 商品优化",
+          "target": "2.4 商品优化"
+        },
+        {
+          "source": "2.4 商品素材优化",
+          "target": "2.4 商品素材优化"
+        },
+        {
+          "source": "3.1 活动前后巡店",
+          "target": "3.1 活动前后巡店"
+        },
+        {
+          "source": "3.2 页面装修与活动信息维护",
+          "target": "3.2 页面装修与活动信息维护"
+        },
+        {
+          "source": "3.3 直播（店播+达播）",
+          "target": "3.3 直播（店播+达播）"
+        },
+        {
+          "source": "4.1 价格策略制定",
+          "target": "4.1 价格策略制定"
+        },
+        {
+          "source": "4.2 赠品\u0026福利赠品",
+          "target": "4.2 赠品\u0026福利赠品"
+        },
+        {
+          "source": "4.3 活动信息收集、报名、选品",
+          "target": "4.3 活动信息收集、报名、选品"
+        },
+        {
+          "source": "4.4 价格设置与系统配置",
+          "target": "4.4 价格设置与系统配置"
+        },
+        {
+          "source": "5.1 推广策略制定",
+          "target": "5.1 推广策略制定"
+        },
+        {
+          "source": "5.2 付费推广执行",
+          "target": "5.2 付费推广执行"
+        },
+        {
+          "source": "5.3 付费推广数据",
+          "target": "5.3 付费推广数据"
+        },
+        {
+          "source": "5.4 内容短视频",
+          "target": "5.4 内容短视频"
+        },
+        {
+          "source": "6.1 会员机制搭建",
+          "target": "6.1 会员机制搭建"
+        },
+        {
+          "source": "6.2 会员页面配置与数据承接",
+          "target": "6.2 会员页面配置与数据承接"
+        },
+        {
+          "source": "6.3 会员数据分析",
+          "target": "6.3 会员数据分析"
+        },
+        {
+          "source": "7.1 数据留存与分析",
+          "target": "7.1 数据留存与分析"
+        },
+        {
+          "source": "7.2 活动复盘",
+          "target": "7.2 活动复盘"
+        },
+        {
+          "source": "7.3 竞品监控",
+          "target": "7.3 竞品监控"
+        },
+        {
+          "source": "8.1 客服与售后",
+          "target": "8.1 客服与售后"
+        },
+        {
+          "source": "8.2 库存核对与履约",
+          "target": "8.2 库存核对与履约"
+        },
+        {
+          "source": "9.1 活动统筹与经营管理",
+          "target": "9.1 活动统筹与经营管理"
+        },
+        {
+          "source": "收集行业信息",
+          "target": "收集行业信息"
+        },
+        {
+          "source": "系统对接及优化",
+          "target": "系统对接及优化"
+        },
+        {
+          "source": "竞店玩法",
+          "target": "竞店玩法"
+        },
+        {
+          "source": "图文内容模块",
+          "target": "图文内容模块"
+        }
+      ],
+      "pg_field": {
+        "comment": "核心环节",
+        "name": "core_link",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "事项类型"
+      },
+      "option_mappings": [
+        {
+          "source": "策略",
+          "target": "策略"
+        },
+        {
+          "source": "经营",
+          "target": "经营"
+        },
+        {
+          "source": "执行操作",
+          "target": "执行操作"
+        },
+        {
+          "source": "复盘",
+          "target": "复盘"
+        }
+      ],
+      "pg_field": {
+        "comment": "事项类型",
+        "name": "item_type",
+        "nullable": true,
+        "single_value": false,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "工作场景"
+      },
+      "pg_field": {
+        "comment": "工作场景",
+        "name": "work_scene",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "sop链接"
+      },
+      "pg_field": {
+        "comment": "sop链接",
+        "name": "sop_link",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "SOP步骤"
+      },
+      "pg_field": {
+        "comment": "SOP步骤",
+        "name": "sop_step",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "部门"
+      },
+      "option_mappings": [
+        {
+          "source": "运营",
+          "target": "运营"
+        },
+        {
+          "source": "商品",
+          "target": "商品"
+        },
+        {
+          "source": "会员",
+          "target": "会员"
+        },
+        {
+          "source": "策划",
+          "target": "策划"
+        },
+        {
+          "source": "推广",
+          "target": "推广"
+        }
+      ],
+      "pg_field": {
+        "comment": "部门",
+        "name": "department",
+        "nullable": true,
+        "single_value": false,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "负责人"
+      },
+      "pg_field": {
+        "comment": "负责人",
+        "name": "person_in_charge",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "岗位层级"
+      },
+      "pg_field": {
+        "comment": "岗位层级",
+        "name": "post_level",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "平台"
+      },
+      "option_mappings": [
+        {
+          "source": "天猫",
+          "target": "天猫"
+        },
+        {
+          "source": "京东",
+          "target": "京东"
+        },
+        {
+          "source": "抖音",
+          "target": "抖音"
+        },
+        {
+          "source": "拼多多",
+          "target": "拼多多"
+        },
+        {
+          "source": "自营",
+          "target": "自营"
+        },
+        {
+          "source": "全平台",
+          "target": "全平台"
+        }
+      ],
+      "pg_field": {
+        "comment": "平台",
+        "name": "app_platform",
+        "nullable": true,
+        "single_value": false,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "工作性质"
+      },
+      "option_mappings": [
+        {
+          "source": "日常",
+          "target": "日常"
+        },
+        {
+          "source": "活动期间",
+          "target": "活动期间"
+        },
+        {
+          "source": "专项",
+          "target": "专项"
+        },
+        {
+          "source": "不固定",
+          "target": "不固定"
+        },
+        {
+          "source": "策略",
+          "target": "策略"
+        }
+      ],
+      "pg_field": {
+        "comment": "工作性质",
+        "name": "work_nature",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "工作性质（原始）"
+      },
+      "pg_field": {
+        "comment": "工作性质（原始）",
+        "name": "work_nature_original",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "频率"
+      },
+      "pg_field": {
+        "comment": "频率",
+        "name": "frequency",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "单次耗时"
+      },
+      "pg_field": {
+        "comment": "单次耗时",
+        "name": "single_time_cost",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "AI基础/自动化备注"
+      },
+      "pg_field": {
+        "comment": "AI基础/自动化备注",
+        "name": "ai_basic_automation_note",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "资料来源"
+      },
+      "pg_field": {
+        "comment": "资料来源",
+        "name": "data_source",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "其他备注"
+      },
+      "pg_field": {
+        "comment": "其他备注",
+        "name": "other_note",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "负责人（人员）"
+      },
+      "pg_field": {
+        "comment": "负责人（人员）",
+        "name": "person_in_charge_1",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "开始日期"
+      },
+      "pg_field": {
+        "comment": "开始日期",
+        "name": "start_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "结束日期"
+      },
+      "pg_field": {
+        "comment": "结束日期",
+        "name": "end_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "对应Skill"
+      },
+      "option_mappings": [
+        {
+          "source": "活动期Skill 1 活动立项与统筹",
+          "target": "活动期Skill 1 活动立项与统筹"
+        },
+        {
+          "source": "活动期Skill 2 目标与流量预测",
+          "target": "活动期Skill 2 目标与流量预测"
+        },
+        {
+          "source": "活动期Skill 3 商品·RD·权益·价盘",
+          "target": "活动期Skill 3 商品·RD·权益·价盘"
+        },
+        {
+          "source": "活动期Skill 4 页面与视觉生产",
+          "target": "活动期Skill 4 页面与视觉生产"
+        },
+        {
+          "source": "活动期Skill 5 渠道报名",
+          "target": "活动期Skill 5 渠道报名"
+        },
+        {
+          "source": "活动期Skill 6 后台配置",
+          "target": "活动期Skill 6 后台配置"
+        },
+        {
+          "source": "活动期Skill 7 活动QA与上线",
+          "target": "活动期Skill 7 活动QA与上线"
+        },
+        {
+          "source": "活动期Skill 8 会员活动",
+          "target": "活动期Skill 8 会员活动"
+        },
+        {
+          "source": "活动期Skill 9 达播筹备",
+          "target": "活动期Skill 9 达播筹备"
+        },
+        {
+          "source": "活动期Skill 10 活动监控与复盘",
+          "target": "活动期Skill 10 活动监控与复盘"
+        },
+        {
+          "source": "日常Skill 1 目标滚动与计划",
+          "target": "日常Skill 1 目标滚动与计划"
+        },
+        {
+          "source": "日常Skill 2 商品资料与上新",
+          "target": "日常Skill 2 商品资料与上新"
+        },
+        {
+          "source": "日常Skill 3 页面与直播内容维护",
+          "target": "日常Skill 3 页面与直播内容维护"
+        },
+        {
+          "source": "日常Skill 4 价格与常规活动",
+          "target": "日常Skill 4 价格与常规活动"
+        },
+        {
+          "source": "日常Skill 5 流量推广与内容运营",
+          "target": "日常Skill 5 流量推广与内容运营"
+        },
+        {
+          "source": "日常Skill 6 会员运营与对账",
+          "target": "日常Skill 6 会员运营与对账"
+        },
+        {
+          "source": "日常Skill 7 数据报表与经营复盘",
+          "target": "日常Skill 7 数据报表与经营复盘"
+        },
+        {
+          "source": "日常Skill 8 客服库存与履约",
+          "target": "日常Skill 8 客服库存与履约"
+        },
+        {
+          "source": "日常Skill 9 经营协同与保障",
+          "target": "日常Skill 9 经营协同与保障"
+        },
+        {
+          "source": "日常Skill 10 行业与竞品监控",
+          "target": "日常Skill 10 行业与竞品监控"
+        },
+        {
+          "source": "专项Skill 1 年度目标与KPI规划",
+          "target": "专项Skill 1 年度目标与KPI规划"
+        },
+        {
+          "source": "专项Skill 2 营销资源规划",
+          "target": "专项Skill 2 营销资源规划"
+        },
+        {
+          "source": "专项Skill 3 会员研究与复盘",
+          "target": "专项Skill 3 会员研究与复盘"
+        },
+        {
+          "source": "专项Skill 4 模板与系统优化",
+          "target": "专项Skill 4 模板与系统优化"
+        },
+        {
+          "source": "专项Skill 5 经营复盘与管理汇报",
+          "target": "专项Skill 5 经营复盘与管理汇报"
+        },
+        {
+          "source": "专项Skill 6 组织与SOP治理",
+          "target": "专项Skill 6 组织与SOP治理"
+        }
+      ],
+      "pg_field": {
+        "comment": "对应Skill",
+        "name": "corresponding_skill",
+        "nullable": true,
+        "single_value": false,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "父记录"
+      },
+      "pg_field": {
+        "comment": "父记录",
+        "name": "app_parent_record",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建时间"
+      },
+      "pg_field": {
+        "comment": "创建时间",
+        "name": "_created_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建人"
+      },
+      "pg_field": {
+        "comment": "创建人",
+        "name": "_created_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新时间"
+      },
+      "pg_field": {
+        "comment": "更新时间",
+        "name": "_updated_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新人"
+      },
+      "pg_field": {
+        "comment": "更新人",
+        "name": "_updated_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    }
+  ],
+  "mode": "streaming",
+  "source": {
+    "base_url": "https://qingmutec.feishu.cn/base/KP2abpA8waP3Nbs3mptcXXMwn9d?table=tblKes4rDW2fQ2Nr",
+    "table": {
+      "name": "🧾 团队工作事项"
+    },
+    "type": "base"
+  },
+  "target": {
+    "table": {
+      "action": "create",
+      "name": "hm_task_templates"
+    },
+    "type": "postgresql"
+  }
+}

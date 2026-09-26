@@ -1,0 +1,427 @@
+{
+  "field_maps": [
+    {
+      "base_field": {
+        "name": "表唯一 ID"
+      },
+      "pg_field": {
+        "comment": "表唯一 ID",
+        "name": "id",
+        "nullable": false,
+        "single_value": true,
+        "type": "uuid",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "Base 表记录 ID"
+      },
+      "pg_field": {
+        "comment": "Base 表记录 ID",
+        "name": "base_record_id",
+        "nullable": true,
+        "single_value": true,
+        "type": "varchar",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "任务"
+      },
+      "pg_field": {
+        "comment": "任务",
+        "name": "app_task",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "板块"
+      },
+      "pg_field": {
+        "comment": "板块",
+        "name": "app_section",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "事项分类"
+      },
+      "pg_field": {
+        "comment": "事项分类",
+        "name": "item_category",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "子分组"
+      },
+      "pg_field": {
+        "comment": "子分组",
+        "name": "sub_group",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "状态"
+      },
+      "option_mappings": [
+        {
+          "source": "未开始",
+          "target": "未开始"
+        },
+        {
+          "source": "进行中",
+          "target": "进行中"
+        },
+        {
+          "source": "已完成",
+          "target": "已完成"
+        },
+        {
+          "source": "已延期",
+          "target": "已延期"
+        }
+      ],
+      "pg_field": {
+        "comment": "状态",
+        "name": "app_status",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "主任务"
+      },
+      "pg_field": {
+        "comment": "主任务",
+        "name": "main_task",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "周"
+      },
+      "pg_field": {
+        "comment": "周",
+        "name": "app_week",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "开始日期"
+      },
+      "pg_field": {
+        "comment": "开始日期",
+        "name": "start_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "结束日期"
+      },
+      "pg_field": {
+        "comment": "结束日期",
+        "name": "end_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "负责人员"
+      },
+      "pg_field": {
+        "comment": "负责人员",
+        "name": "responsible_person",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile"
+      }
+    },
+    {
+      "base_field": {
+        "name": "艾莎"
+      },
+      "pg_field": {
+        "comment": "艾莎",
+        "name": "app_aisa",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "魔南"
+      },
+      "pg_field": {
+        "comment": "魔南",
+        "name": "monan",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "岭罗"
+      },
+      "pg_field": {
+        "comment": "岭罗",
+        "name": "lingluo",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "榅桲"
+      },
+      "pg_field": {
+        "comment": "榅桲",
+        "name": "wenbo",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "全员"
+      },
+      "pg_field": {
+        "comment": "全员",
+        "name": "all_staff",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "川赤"
+      },
+      "pg_field": {
+        "comment": "川赤",
+        "name": "chuanchi",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "罗青"
+      },
+      "pg_field": {
+        "comment": "罗青",
+        "name": "luoqing",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "大雀"
+      },
+      "pg_field": {
+        "comment": "大雀",
+        "name": "dacque",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "荔莴"
+      },
+      "pg_field": {
+        "comment": "荔莴",
+        "name": "liwo",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "春豌"
+      },
+      "pg_field": {
+        "comment": "春豌",
+        "name": "chunwan",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "银棠"
+      },
+      "pg_field": {
+        "comment": "银棠",
+        "name": "yin_tang",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "果连"
+      },
+      "pg_field": {
+        "comment": "果连",
+        "name": "guo_lian",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "生碱"
+      },
+      "pg_field": {
+        "comment": "生碱",
+        "name": "sheng_jian",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "华灰"
+      },
+      "pg_field": {
+        "comment": "华灰",
+        "name": "hua_hui",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "双灯"
+      },
+      "pg_field": {
+        "comment": "双灯",
+        "name": "shuang_deng",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "父记录"
+      },
+      "pg_field": {
+        "comment": "父记录",
+        "name": "app_father_record",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建时间"
+      },
+      "pg_field": {
+        "comment": "创建时间",
+        "name": "_created_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建人"
+      },
+      "pg_field": {
+        "comment": "创建人",
+        "name": "_created_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新时间"
+      },
+      "pg_field": {
+        "comment": "更新时间",
+        "name": "_updated_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新人"
+      },
+      "pg_field": {
+        "comment": "更新人",
+        "name": "_updated_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    }
+  ],
+  "mode": "streaming",
+  "source": {
+    "base_url": "https://qingmutec.feishu.cn/base/O4XhbiUw2aa5yRsgR8fckrNpnXe?table=tblyHppWou4Cel1D",
+    "table": {
+      "name": "南桑"
+    },
+    "type": "base"
+  },
+  "target": {
+    "table": {
+      "action": "create",
+      "name": "hm_tasks"
+    },
+    "type": "postgresql"
+  }
+}

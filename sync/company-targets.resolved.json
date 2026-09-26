@@ -1,0 +1,511 @@
+{
+  "field_maps": [
+    {
+      "base_field": {
+        "name": "表唯一 ID"
+      },
+      "pg_field": {
+        "comment": "表唯一 ID",
+        "name": "id",
+        "nullable": false,
+        "single_value": true,
+        "type": "uuid",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "Base 表记录 ID"
+      },
+      "pg_field": {
+        "comment": "Base 表记录 ID",
+        "name": "base_record_id",
+        "nullable": true,
+        "single_value": true,
+        "type": "varchar",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "事业部"
+      },
+      "pg_field": {
+        "comment": "事业部",
+        "name": "app_department_1",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "部门"
+      },
+      "pg_field": {
+        "comment": "部门",
+        "name": "app_department",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "店铺"
+      },
+      "option_mappings": [
+        {
+          "source": "HM官方旗舰店",
+          "target": "HM官方旗舰店"
+        },
+        {
+          "source": "H\u0026M官方旗舰店",
+          "target": "H\u0026M官方旗舰店"
+        }
+      ],
+      "pg_field": {
+        "comment": "店铺",
+        "name": "app_shop",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "平台"
+      },
+      "option_mappings": [
+        {
+          "source": "天猫",
+          "target": "天猫"
+        },
+        {
+          "source": "京东",
+          "target": "京东"
+        }
+      ],
+      "pg_field": {
+        "comment": "平台",
+        "name": "app_platform",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "店铺名+平台"
+      },
+      "option_mappings": [
+        {
+          "source": "HM官方旗舰店_天猫",
+          "target": "HM官方旗舰店_天猫"
+        },
+        {
+          "source": "H\u0026M官方旗舰店_京东",
+          "target": "H\u0026M官方旗舰店_京东"
+        }
+      ],
+      "pg_field": {
+        "comment": "店铺名+平台",
+        "name": "shop_name_platform",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "月份"
+      },
+      "pg_field": {
+        "comment": "月份",
+        "name": "app_month",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "备注"
+      },
+      "pg_field": {
+        "comment": "备注",
+        "name": "app_remark",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "26年目标\n（含购物金）"
+      },
+      "pg_field": {
+        "comment": "26年目标\n（含购物金）",
+        "name": "26_year_target_with_shopping_gold",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "26年目标\n（不含购物金）"
+      },
+      "pg_field": {
+        "comment": "26年目标\n（不含购物金）",
+        "name": "26_year_target_without_shopping_gold",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "2026年\n退款率目标\n（不含购物金，财务口径）"
+      },
+      "pg_field": {
+        "comment": "2026年\n退款率目标\n（不含购物金，财务口径）",
+        "name": "2026_year_refund_rate_target_without_shopping_gold_financial",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "2026年\n实收目标\n（不含购物金GMV X 不含购物金退款率）"
+      },
+      "pg_field": {
+        "comment": "2026年\n实收目标\n（不含购物金GMV X 不含购物金退款率）",
+        "name": "2026_actual_target_gmv_x_refund_rate",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "2025年\n实际达成（1）"
+      },
+      "pg_field": {
+        "comment": "2025年\n实际达成（1）",
+        "name": "2025_actual_completion_1",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "YOY"
+      },
+      "pg_field": {
+        "comment": "YOY",
+        "name": "yoy",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "25年目标\n（含购物金）"
+      },
+      "pg_field": {
+        "comment": "25年目标\n（含购物金）",
+        "name": "25_target_include_shopping_gold",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "25年目标\n（不含购物金）"
+      },
+      "pg_field": {
+        "comment": "25年目标\n（不含购物金）",
+        "name": "25_target_exclude_shopping_gold",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "2025年\n退款率目标\n（不含购物金，财务口径）"
+      },
+      "pg_field": {
+        "comment": "2025年\n退款率目标\n（不含购物金，财务口径）",
+        "name": "2025_refund_rate_target_exclude_shopping_gold_financial",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "2025年\n实收目标\n（不含购物金GMV X 不含购物金退款率）"
+      },
+      "pg_field": {
+        "comment": "2025年\n实收目标\n（不含购物金GMV X 不含购物金退款率）",
+        "name": "2025_actual_target_gmv_x_refund_rate",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "2025年\n实际达成"
+      },
+      "pg_field": {
+        "comment": "2025年\n实际达成",
+        "name": "2025_actual_completion",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "26年\n目标同比（含购物金）"
+      },
+      "pg_field": {
+        "comment": "26年\n目标同比（含购物金）",
+        "name": "26_target_yoy_include_shopping_gold",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "26年\n目标同比（不含购物金）"
+      },
+      "pg_field": {
+        "comment": "26年\n目标同比（不含购物金）",
+        "name": "26_target_yoy_exclude_shopping_gold",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "26年\n退款率差值\n（不含购物金，财务口径）"
+      },
+      "pg_field": {
+        "comment": "26年\n退款率差值\n（不含购物金，财务口径）",
+        "name": "26_refund_rate_diff_no_shopping_fina",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "26年\n实收同比"
+      },
+      "pg_field": {
+        "comment": "26年\n实收同比",
+        "name": "26_paid_year_on_year",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "24年\nGMV（含购物金）"
+      },
+      "pg_field": {
+        "comment": "24年\nGMV（含购物金）",
+        "name": "24_gmv_with_shopping",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "24年\nGMV（不含购物金）"
+      },
+      "pg_field": {
+        "comment": "24年\nGMV（不含购物金）",
+        "name": "24_gmv_no_shopping",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "24年\n退款率（不含购物金，财务口径）"
+      },
+      "pg_field": {
+        "comment": "24年\n退款率（不含购物金，财务口径）",
+        "name": "24_refund_rate_no_shopping_fina",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "24年\n实收（不含购物金GMV X 不含购物金退款率）"
+      },
+      "pg_field": {
+        "comment": "24年\n实收（不含购物金GMV X 不含购物金退款率）",
+        "name": "24_paid_no_shopping_gmv_x_refund",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "25年\n目标同比（含购物金）"
+      },
+      "pg_field": {
+        "comment": "25年\n目标同比（含购物金）",
+        "name": "25_target_yoy_with_shopping",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "25年\n目标同比（不含购物金）"
+      },
+      "pg_field": {
+        "comment": "25年\n目标同比（不含购物金）",
+        "name": "25_target_yoy_no_shopping",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "25年\n退款率差值\n（不含购物金，财务口径）"
+      },
+      "pg_field": {
+        "comment": "25年\n退款率差值\n（不含购物金，财务口径）",
+        "name": "25_refund_rate_diff_no_shopping_fina",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "25年\n实收同比"
+      },
+      "pg_field": {
+        "comment": "25年\n实收同比",
+        "name": "25_paid_year_on_year",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "2024年\n实际达成"
+      },
+      "pg_field": {
+        "comment": "2024年\n实际达成",
+        "name": "2024_actual_achievement",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "25VS24-yoy"
+      },
+      "pg_field": {
+        "comment": "25VS24-yoy",
+        "name": "25vs24_yoy",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建时间"
+      },
+      "pg_field": {
+        "comment": "创建时间",
+        "name": "_created_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建人"
+      },
+      "pg_field": {
+        "comment": "创建人",
+        "name": "_created_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新时间"
+      },
+      "pg_field": {
+        "comment": "更新时间",
+        "name": "_updated_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新人"
+      },
+      "pg_field": {
+        "comment": "更新人",
+        "name": "_updated_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    }
+  ],
+  "mode": "streaming",
+  "source": {
+    "base_url": "https://qingmutec.feishu.cn/base/PNlTbnPPdaC4mKsWiulcuYzznHd?table=tbl74NgTMPJdwQXH",
+    "table": {
+      "name": "QM目标"
+    },
+    "type": "base"
+  },
+  "target": {
+    "table": {
+      "action": "create",
+      "name": "hm_company_targets"
+    },
+    "type": "postgresql"
+  }
+}

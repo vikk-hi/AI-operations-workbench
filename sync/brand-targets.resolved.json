@@ -1,0 +1,325 @@
+{
+  "field_maps": [
+    {
+      "base_field": {
+        "name": "表唯一 ID"
+      },
+      "pg_field": {
+        "comment": "表唯一 ID",
+        "name": "id",
+        "nullable": false,
+        "single_value": true,
+        "type": "uuid",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "Base 表记录 ID"
+      },
+      "pg_field": {
+        "comment": "Base 表记录 ID",
+        "name": "base_record_id",
+        "nullable": true,
+        "single_value": true,
+        "type": "varchar",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "日期"
+      },
+      "pg_field": {
+        "comment": "日期",
+        "name": "app_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "月"
+      },
+      "pg_field": {
+        "comment": "月",
+        "name": "app_month",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "活动"
+      },
+      "pg_field": {
+        "comment": "活动",
+        "name": "app_activity",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "周期（活动维度）-需提前维护"
+      },
+      "pg_field": {
+        "comment": "周期（活动维度）-需提前维护",
+        "name": "activity_dimension",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "GMV目标"
+      },
+      "pg_field": {
+        "comment": "GMV目标",
+        "name": "gmv_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "UV目标"
+      },
+      "pg_field": {
+        "comment": "UV目标",
+        "name": "uv_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "DDN目标"
+      },
+      "pg_field": {
+        "comment": "DDN目标",
+        "name": "ddn_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "NET目标"
+      },
+      "pg_field": {
+        "comment": "NET目标",
+        "name": "net_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "CR目标"
+      },
+      "pg_field": {
+        "comment": "CR目标",
+        "name": "cr_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "ASP目标"
+      },
+      "pg_field": {
+        "comment": "ASP目标",
+        "name": "asp_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "AOV目标"
+      },
+      "pg_field": {
+        "comment": "AOV目标",
+        "name": "aov_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "int8"
+      }
+    },
+    {
+      "base_field": {
+        "name": "DDN实际（不用）"
+      },
+      "pg_field": {
+        "comment": "DDN实际（不用）",
+        "name": "ddn_actual_unused",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "淘宝客 SOB 目标"
+      },
+      "pg_field": {
+        "comment": "淘宝客 SOB 目标",
+        "name": "taobao_ke_sob_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "限时红包 SOB目标"
+      },
+      "pg_field": {
+        "comment": "限时红包 SOB目标",
+        "name": "time_limit_red_packet_sob_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "新客加速 SOB目标"
+      },
+      "pg_field": {
+        "comment": "新客加速 SOB目标",
+        "name": "new_customer_acceleration_sob_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "淘金币 SOB目标"
+      },
+      "pg_field": {
+        "comment": "淘金币 SOB目标",
+        "name": "tao_gold_coin_sob_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "百亿补贴 SOB目标"
+      },
+      "pg_field": {
+        "comment": "百亿补贴 SOB目标",
+        "name": "hundred_billion_subsidy_sob_target",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "对应2025年日期"
+      },
+      "pg_field": {
+        "comment": "对应2025年日期",
+        "name": "corresponding_2025_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "25年实际DDN"
+      },
+      "pg_field": {
+        "comment": "25年实际DDN",
+        "name": "25_year_actual_ddn",
+        "nullable": true,
+        "single_value": true,
+        "type": "numeric"
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建时间"
+      },
+      "pg_field": {
+        "comment": "创建时间",
+        "name": "_created_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建人"
+      },
+      "pg_field": {
+        "comment": "创建人",
+        "name": "_created_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新时间"
+      },
+      "pg_field": {
+        "comment": "更新时间",
+        "name": "_updated_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新人"
+      },
+      "pg_field": {
+        "comment": "更新人",
+        "name": "_updated_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    }
+  ],
+  "mode": "streaming",
+  "source": {
+    "base_url": "https://qingmutec.feishu.cn/base/M1z2bWhVhahRlDsBUG1cDQUwnRg?table=tblPCKtYMyuuquPu",
+    "table": {
+      "name": "biz plan目标"
+    },
+    "type": "base"
+  },
+  "target": {
+    "table": {
+      "action": "create",
+      "name": "hm_brand_targets"
+    },
+    "type": "postgresql"
+  }
+}

@@ -1,0 +1,263 @@
+{
+  "field_maps": [
+    {
+      "base_field": {
+        "name": "表唯一 ID"
+      },
+      "pg_field": {
+        "comment": "表唯一 ID",
+        "name": "id",
+        "nullable": false,
+        "single_value": true,
+        "type": "uuid",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "Base 表记录 ID"
+      },
+      "pg_field": {
+        "comment": "Base 表记录 ID",
+        "name": "base_record_id",
+        "nullable": true,
+        "single_value": true,
+        "type": "varchar",
+        "unique": true
+      }
+    },
+    {
+      "base_field": {
+        "name": "活动名称"
+      },
+      "pg_field": {
+        "comment": "活动名称",
+        "name": "activity_name",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "大促类型"
+      },
+      "option_mappings": [
+        {
+          "source": "A/S",
+          "target": "A/S"
+        },
+        {
+          "source": "S+",
+          "target": "S+"
+        }
+      ],
+      "pg_field": {
+        "comment": "大促类型",
+        "name": "promotion_type",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "活动预热日期"
+      },
+      "pg_field": {
+        "comment": "活动预热日期",
+        "name": "activity_preheat_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "活动开始日期"
+      },
+      "pg_field": {
+        "comment": "活动开始日期",
+        "name": "activity_start_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "活动结束日期"
+      },
+      "pg_field": {
+        "comment": "活动结束日期",
+        "name": "activity_end_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "端口"
+      },
+      "pg_field": {
+        "comment": "端口",
+        "name": "port",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "一级事项"
+      },
+      "pg_field": {
+        "comment": "一级事项",
+        "name": "primary_item",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "事项"
+      },
+      "pg_field": {
+        "comment": "事项",
+        "name": "item",
+        "nullable": true,
+        "single_value": true,
+        "type": "text"
+      }
+    },
+    {
+      "base_field": {
+        "name": "事项开始日期"
+      },
+      "pg_field": {
+        "comment": "事项开始日期",
+        "name": "item_start_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "事项结束日期"
+      },
+      "pg_field": {
+        "comment": "事项结束日期",
+        "name": "item_end_date",
+        "nullable": true,
+        "single_value": true,
+        "type": "date"
+      }
+    },
+    {
+      "base_field": {
+        "name": "负责人"
+      },
+      "pg_field": {
+        "comment": "负责人",
+        "name": "app_principal",
+        "nullable": true,
+        "single_value": true,
+        "type": "jsonb"
+      }
+    },
+    {
+      "base_field": {
+        "name": "是否完成"
+      },
+      "pg_field": {
+        "comment": "是否完成",
+        "name": "app_is_completed",
+        "nullable": true,
+        "single_value": true,
+        "type": "bool"
+      }
+    },
+    {
+      "base_field": {
+        "name": "测试人员"
+      },
+      "pg_field": {
+        "comment": "测试人员",
+        "name": "tester",
+        "nullable": true,
+        "single_value": false,
+        "type": "user_profile"
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建时间"
+      },
+      "pg_field": {
+        "comment": "创建时间",
+        "name": "_created_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "创建人"
+      },
+      "pg_field": {
+        "comment": "创建人",
+        "name": "_created_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新时间"
+      },
+      "pg_field": {
+        "comment": "更新时间",
+        "name": "_updated_at",
+        "nullable": false,
+        "single_value": true,
+        "type": "timestamptz",
+        "unique": false
+      }
+    },
+    {
+      "base_field": {
+        "name": "更新人"
+      },
+      "pg_field": {
+        "comment": "更新人",
+        "name": "_updated_by",
+        "nullable": true,
+        "single_value": true,
+        "type": "user_profile",
+        "unique": false
+      }
+    }
+  ],
+  "mode": "streaming",
+  "source": {
+    "base_url": "https://qingmutec.feishu.cn/base/KP2abpA8waP3Nbs3mptcXXMwn9d?table=tbl2bLwV4QSLDVYL",
+    "table": {
+      "name": "✅ 大促TIMELINE（自动生成）"
+    },
+    "type": "base"
+  },
+  "target": {
+    "table": {
+      "action": "create",
+      "name": "hm_activity_timeline"
+    },
+    "type": "postgresql"
+  }
+}

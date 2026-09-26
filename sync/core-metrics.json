@@ -1,0 +1,17 @@
+{
+  "mode": "streaming",
+  "source": {
+    "type": "base",
+    "base_url": "https://qingmutec.feishu.cn/base/M1z2bWhVhahRlDsBUG1cDQUwnRg?table=tblxTrxDK5lGJxlo",
+    "table": {
+      "name": "2026天猫日报"
+    }
+  },
+  "target": {
+    "type": "postgresql",
+    "table": {
+      "name": "hm_core_metrics",
+      "action": "create"
+    }
+  }
+}
