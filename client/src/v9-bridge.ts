@@ -3,6 +3,7 @@ import { logger } from '@lark-apaas/client-toolkit/logger';
 import { axiosForBackend } from '@lark-apaas/client-toolkit/utils/getAxiosForBackend';
 import type { CategoryResponse, CoreOverviewResponse, DataSourcesResponse, ProductSourceResponse, TargetProgressResponse, TasksDashboardResponse, TimelineResponse } from '@shared/api.interface';
 import { createWorkbenchWriter } from './workbench-write.mjs';
+import './live-task-model.mjs';
 
 declare global {
   interface Window {

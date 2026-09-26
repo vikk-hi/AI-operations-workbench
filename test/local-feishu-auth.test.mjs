@@ -74,6 +74,15 @@ test('local preview reads through localhost and exposes only task PATCH writes',
   assert.doesNotMatch(writer, /timeline/);
 });
 
+test('live task adapter exposes verified editing without create, delete, or timeline writes', async () => {
+  const adapter = await readFile(new URL('../client/v9-source/live-adapter.js', import.meta.url), 'utf8');
+  assert.match(adapter, /data-live-act="task-edit"/);
+  assert.match(adapter, /__hmWrite\('tasks','PATCH'/);
+  assert.match(adapter, /syncStatus!=='verified'/);
+  assert.doesNotMatch(adapter, /live-task-create|task-delete|live-timeline-create|timeline-toggle|timeline-delete/);
+  assert.doesNotMatch(adapter, /window\.prompt/);
+});
+
 test('combined local launcher binds the client to the documented IPv4 address', async () => {
   const launcher = await readFile(new URL('../scripts/dev-local-web.js', import.meta.url), 'utf8');
   assert.match(launcher, /npm run dev:client -- --host 127\.0\.0\.1/);
