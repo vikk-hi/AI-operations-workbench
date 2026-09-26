@@ -9,8 +9,8 @@
 | 模块 | Base | 表 | 状态 |
 | --- | --- | --- | --- |
 | 核心经营数据 | `M1z2bWhVhahRlDsBUG1cDQUwnRg` | `tblxTrxDK5lGJxlo`（2026天猫日报） | 已授权 |
-| 执行任务 | `O4XhbiUw2aa5yRsgR8fckrNpnXe` | `tbl1Hi7UvvXTzTiQ` | 未授权：Feishu `91403` |
-| 活动时间线 | `KP2abpA8waP3Nbs3mptcXXMwn9d` | `tbl2bLwV4QSLDVYL` | 未授权：Feishu `91403` |
+| 执行任务 | `O4XhbiUw2aa5yRsgR8fckrNpnXe` | `tbl1Hi7UvvXTzTiQ`（工作日报任务） | 已授权 |
+| 活动时间线 | `KP2abpA8waP3Nbs3mptcXXMwn9d` | `tbl2bLwV4QSLDVYL`（大促 TIMELINE） | 已授权 |
 | 公司目标 | `PNlTbnPPdaC4mKsWiulcuYzznHd` | `tbl74NgTMPJdwQXH`（QM目标） | 已授权 |
 
 ## 核心经营数据
@@ -52,6 +52,19 @@
 - `2026年\n实收目标\n（不含购物金GMV X 不含购物金退款率）`
 - 2025/2024 实际、目标、退款率及同比系列字段
 
-## 未授权模块处理
+## 执行任务
 
-执行任务和活动时间线在应用取得对应 Base 的“可阅读”协作者权限前保持模块级错误，不回退到演示数据，也不猜测字段或表结构。
+- `任务事项`、`子分组`、`备注`（文本，type 1）
+- `负责人`（人员，type 11）
+- `板块`、`事项分类`、`状态`（单选，type 3）
+- 各成员同名关联字段（双向关联，type 21）
+
+当前源表没有开始/结束日期字段，任务接口对此返回 `null`，不会猜测日期。任务模板来自另一 Base，尚未单独启用为模板来源。
+
+## 活动时间线
+
+- `活动名称`、`事项`（文本，type 1）
+- `活动开始日期`、`活动结束日期`、`事项开始日期`、`事项结束日期`（日期，type 5）
+- `负责人`、`端口`、`一级事项`（多选，type 19）
+- `是否完成`（复选框，type 7）
+- `测试人员`（人员，type 11）
