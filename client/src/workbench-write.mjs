@@ -11,10 +11,25 @@ export function createWorkbenchWriter({ baseUrl, fetchImpl = fetch, refresh }) {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
       const error = payload?.error;
-      const message = typeof error === 'string' ? error : response.status === 401 ? '请先登录' : `操作失败（${error?.code ?? response.status}）`;
-      throw new Error(message);
+      const code = error?.code;
+      const staleMessages = {
+        STALE_STATUS: '状态选项已更新，请重新选择后保存',
+        STALE_OWNER: '负责人候选已更新，请重新选择后保存',
+        RECORD_NOT_FOUND: '该任务记录已不存在，请刷新任务列表',
+      };
+      if (code && staleMessages[code]) await refresh().catch(() => {});
+      const message = typeof error === 'string' ? error
+        : response.status === 401 ? '请先登录'
+          : staleMessages[code] ?? `操作失败（${code ?? response.status}）`;
+      const failure = new Error(message);
+      failure.code = code;
+      throw failure;
     }
-    await refresh();
+    try {
+      await refresh();
+    } catch {
+      throw new Error('数据已写入并验证，但页面刷新失败，请保留当前窗口并重试刷新');
+    }
     return payload;
   };
 }

@@ -60,6 +60,15 @@ class TaskVerificationError extends Error {
   }
 }
 
+class TaskUpdateError extends Error {
+  constructor(code, message) {
+    super(message);
+    this.name = 'TaskUpdateError';
+    this.kind = 'invalid_task_update';
+    this.code = code;
+  }
+}
+
 const sortedIds = (values) => [...values].sort((left, right) => left.localeCompare(right));
 
 export function createTaskRepository({ client, source, now = () => new Date() }) {
@@ -100,7 +109,7 @@ export function createTaskRepository({ client, source, now = () => new Date() })
         client.listAllRecords(source.appToken, source.tableId),
       ]);
       const current = records.find((record) => record.record_id === normalizedId);
-      if (!current) throw new Error('任务记录不存在，请刷新后重试');
+      if (!current) throw new TaskUpdateError('RECORD_NOT_FOUND', '任务记录不存在，请刷新后重试');
       const reader = createFieldReader(definitions, { sourceAlias: source.key });
       reader.requireField('任务事项', [1]);
       reader.requireField('负责人', [11]);
@@ -115,13 +124,13 @@ export function createTaskRepository({ client, source, now = () => new Date() })
 
       if ('status' in body) {
         expectedStatus = nonEmptyText(body.status);
-        if (!expectedStatus || !validStatuses.has(expectedStatus)) throw new Error('状态选项已失效，请刷新后重新选择');
+        if (!expectedStatus || !validStatuses.has(expectedStatus)) throw new TaskUpdateError('STALE_STATUS', '状态选项已失效，请刷新后重新选择');
         fields.状态 = expectedStatus;
       }
       if ('responsibleOpenIds' in body) {
         if (!Array.isArray(body.responsibleOpenIds)) throw new Error('负责人必须是人员 ID 列表');
         expectedOwnerIds = [...new Set(body.responsibleOpenIds.map(nonEmptyText).filter(Boolean))];
-        if (expectedOwnerIds.some((ownerId) => !validOwnerIds.has(ownerId))) throw new Error('负责人选项已失效，请刷新后重新选择');
+        if (expectedOwnerIds.some((ownerId) => !validOwnerIds.has(ownerId))) throw new TaskUpdateError('STALE_OWNER', '负责人选项已失效，请刷新后重新选择');
         fields.负责人 = expectedOwnerIds.map((ownerId) => ({ id: ownerId }));
       }
 

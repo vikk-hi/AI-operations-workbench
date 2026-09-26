@@ -70,6 +70,7 @@ test('local preview reads through localhost and exposes only task PATCH writes',
   assert.match(bridge, /fetch\(`\$\{localAuthBase\}\/api\/workbench/);
   assert.match(bridge, /axiosForBackend/);
   assert.match(bridge, /createWorkbenchWriter/);
+  assert.match(bridge, /refresh:\s*\(\)\s*=>\s*loadWorkbench\(true\)/);
   assert.match(writer, /moduleName !== 'tasks' \|\| method !== 'PATCH'/);
   assert.doesNotMatch(writer, /timeline/);
 });
@@ -81,6 +82,7 @@ test('live task adapter exposes verified editing without create, delete, or time
   assert.match(adapter, /syncStatus!=='verified'/);
   assert.doesNotMatch(adapter, /live-task-create|task-delete|live-timeline-create|timeline-toggle|timeline-delete/);
   assert.doesNotMatch(adapter, /window\.prompt/);
+  assert.match(adapter, /data-live-act="task-save"[^>]*disabled/);
 });
 
 test('combined local launcher binds the client to the documented IPv4 address', async () => {

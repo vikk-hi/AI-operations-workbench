@@ -11,7 +11,7 @@ const source = (key, label, appToken, tableId, enabled = true, writable = false)
 const SOURCES = Object.freeze({
   core: source('core', '核心经营数据', 'M1z2bWhVhahRlDsBUG1cDQUwnRg', 'tblxTrxDK5lGJxlo'),
   tasks: source('tasks', '执行任务', 'O4XhbiUw2aa5yRsgR8fckrNpnXe', 'tbl1Hi7UvvXTzTiQ', true, true),
-  timeline: source('timeline', '活动时间线', 'KP2abpA8waP3Nbs3mptcXXMwn9d', 'tbl2bLwV4QSLDVYL', true, true),
+  timeline: source('timeline', '活动时间线', 'KP2abpA8waP3Nbs3mptcXXMwn9d', 'tbl2bLwV4QSLDVYL'),
   companyTargets: source('companyTargets', '公司目标', 'PNlTbnPPdaC4mKsWiulcuYzznHd', 'tbl74NgTMPJdwQXH'),
   coreHistory: source('coreHistory', '核心经营历史同期', 'M1z2bWhVhahRlDsBUG1cDQUwnRg', null, false),
   taskTemplates: source('taskTemplates', '任务模板', 'KP2abpA8waP3Nbs3mptcXXMwn9d', null, false),

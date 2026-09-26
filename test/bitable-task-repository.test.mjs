@@ -111,9 +111,9 @@ test('rejects empty, extra, stale, unknown-owner, and missing-record task update
 
   await assert.rejects(repository.updateTask('rec_1', {}, { id: 'ou_actor' }), /没有可更新/);
   await assert.rejects(repository.updateTask('rec_1', { status: '进行中', title: '越权修改' }, { id: 'ou_actor' }), /不允许更新字段/);
-  await assert.rejects(repository.updateTask('rec_1', { status: '已归档' }, { id: 'ou_actor' }), /状态选项/);
-  await assert.rejects(repository.updateTask('rec_1', { responsibleOpenIds: ['ou_missing'] }, { id: 'ou_actor' }), /负责人/);
-  await assert.rejects(repository.updateTask('rec_missing', { status: '进行中' }, { id: 'ou_actor' }), /记录不存在/);
+  await assert.rejects(repository.updateTask('rec_1', { status: '已归档' }, { id: 'ou_actor' }), (error) => error.code === 'STALE_STATUS' && /状态选项/.test(error.message));
+  await assert.rejects(repository.updateTask('rec_1', { responsibleOpenIds: ['ou_missing'] }, { id: 'ou_actor' }), (error) => error.code === 'STALE_OWNER' && /负责人/.test(error.message));
+  await assert.rejects(repository.updateTask('rec_missing', { status: '进行中' }, { id: 'ou_actor' }), (error) => error.code === 'RECORD_NOT_FOUND' && /记录不存在/.test(error.message));
   await assert.rejects(repository.updateTask('', { status: '进行中' }, { id: 'ou_actor' }), /记录 ID/);
   assert.deepEqual(writes, []);
 });

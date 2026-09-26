@@ -49,3 +49,28 @@ test('reports a signed-out task update without refresh', async () => {
   await assert.rejects(writer('tasks', 'PATCH', 'rec_1', { status: '进行中' }), /请先登录/);
   assert.equal(refreshes, 0);
 });
+
+test('reports a verified write whose strict page refresh fails', async () => {
+  const writer = createWorkbenchWriter({
+    baseUrl: 'http://127.0.0.1:3001',
+    fetchImpl: async () => ({ ok: true, status: 200, async json() { return { syncStatus: 'verified' }; } }),
+    refresh: async () => { throw new Error('module refresh failed'); },
+  });
+
+  await assert.rejects(writer('tasks', 'PATCH', 'rec_1', { status: '进行中' }), /数据已写入并验证.*页面刷新失败/);
+});
+
+test('refreshes stale task choices before reporting a specific update error', async () => {
+  let refreshes = 0;
+  const writer = createWorkbenchWriter({
+    baseUrl: 'http://127.0.0.1:3001',
+    fetchImpl: async () => ({
+      ok: false, status: 409,
+      async json() { return { error: { kind: 'invalid_task_update', code: 'STALE_STATUS' } }; },
+    }),
+    refresh: async () => { refreshes += 1; },
+  });
+
+  await assert.rejects(writer('tasks', 'PATCH', 'rec_1', { status: '旧状态' }), /状态选项已更新/);
+  assert.equal(refreshes, 1);
+});

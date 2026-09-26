@@ -45,14 +45,17 @@ export function createWorkbenchApi(repositories, options = {}) {
       const id = decodeURIComponent(match[1]);
       try {
         const result = await repositories.tasks.updateTask(id, body ?? {}, viewer);
-        clearModuleCache('tasks');
         return { status: 200, body: result };
       } catch (error) {
         const diagnostic = redactedError(error);
         const status = diagnostic.kind === 'verification_mismatch' ? 409
+          : ['STALE_STATUS', 'STALE_OWNER'].includes(diagnostic.code) ? 409
+            : diagnostic.code === 'RECORD_NOT_FOUND' ? 404
           : diagnostic.kind === 'forbidden' ? 403
             : error instanceof Error && !('kind' in error) ? 400 : 503;
         return { status, body: { error: diagnostic } };
+      } finally {
+        clearModuleCache('tasks');
       }
     },
   });

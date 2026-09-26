@@ -46,7 +46,7 @@ const workbenchApi = createWorkbenchApi({
       baseUrl: `https://qingmutec.feishu.cn/base/${source.appToken}?table=${source.tableId}`,
       tableName: source.label, mode: source.writable ? 'read-write' : 'continuous-sync', readOnlyOriginal: source.readOnly,
     })),
-    replacementRule: '本地通过飞书开放 API 访问原始多维表格；任务和活动时间线受控读写，核心经营与目标数据只读',
+    replacementRule: '本地通过飞书开放 API 访问原始多维表格；仅任务状态和负责人可受控更新，活动时间线、核心经营与目标数据只读',
   },
 });
 

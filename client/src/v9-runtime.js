@@ -663,18 +663,25 @@ function liveTaskEditor(task){
  const draft=liveTaskModel.createTaskEditDraft(task),statusOptions=[...new Set([...(liveData?.tasks?.statusOptions||[]),task.status].filter(Boolean))],ownerOptions=liveData?.tasks?.ownerOptions||[];
  const readonly=`<div class="live-task-readonly"><div><small>任务标题</small><b>${esc(task.title)}</b></div><div><small>板块</small><span>${esc(task.section||'未分组')}</span></div><div><small>事项分类</small><span>${esc(task.category||'未设置')}</span></div><div><small>子分组</small><span>${esc(task.subgroup||'未设置')}</span></div><div class="wide"><small>备注</small><span>${esc(task.notes||'无备注')}</span></div><div class="wide"><small>多维表记录 ID</small><span class="mono">${esc(task.id)}</span></div></div>`;
  const editor=liveCanWrite()?`<form id="liveTaskEditForm"><div class="field"><label for="liveTaskEditStatus">状态</label><select id="liveTaskEditStatus">${statusOptions.map(value=>`<option value="${esc(value)}" ${value===draft.status?'selected':''}>${esc(value)}</option>`).join('')}</select></div><div class="field"><label>负责人</label><div class="v9-user-options live-task-owners">${ownerOptions.map(person=>`<label><input type="checkbox" name="liveTaskResponsible" value="${esc(person.id)}" ${draft.responsibleOpenIds.includes(person.id)?'checked':''}><span>${esc(person.name)}</span></label>`).join('')||'<span class="meta">任务表中没有可用负责人候选。</span>'}</div><small>候选人来自当前任务表中已经出现过的负责人。</small></div></form>`:notice('当前为只读查看。使用飞书登录后才能修改状态和负责人。','amber');
- const foot=btn('取消','close-modal')+(liveCanWrite()?'<button class="btn primary" data-live-act="task-save" data-record-id="'+esc(task.id)+'">保存修改</button>':'<button class="btn primary" data-live-act="feishu-login">使用飞书登录</button>');
+ const foot=btn('取消','close-modal')+(liveCanWrite()?'<button class="btn primary" data-live-act="task-save" data-record-id="'+esc(task.id)+'" disabled>保存修改</button>':'<button class="btn primary" data-live-act="feishu-login">使用飞书登录</button>');
  openModal('任务详情与更新',readonly+editor,foot,true);
+}
+function liveTaskFormPatch(task){
+ const status=$('#liveTaskEditStatus')?.value||'',responsibleOpenIds=[...document.querySelectorAll('input[name="liveTaskResponsible"]:checked')].map(input=>input.value);
+ return liveTaskModel.buildTaskPatch(task,{status,responsibleOpenIds});
+}
+function syncLiveTaskSaveState(task){
+ const button=$('[data-live-act="task-save"]');
+ if(button)button.disabled=liveTaskSaving||!liveTaskFormPatch(task);
 }
 async function saveLiveTask(task){
  if(liveTaskSaving||!liveCanWrite())return;
- const status=$('#liveTaskEditStatus')?.value||'',responsibleOpenIds=[...document.querySelectorAll('input[name="liveTaskResponsible"]:checked')].map(input=>input.value);
- const patch=liveTaskModel.buildTaskPatch(task,{status,responsibleOpenIds});
+ const patch=liveTaskFormPatch(task);
  if(!patch){modalError('没有需要保存的修改。');return;}
  liveTaskSaving=true;const button=$('[data-live-act="task-save"]');if(button){button.disabled=true;button.textContent='正在同步…';}
- try{const result=await window.__hmWrite('tasks','PATCH',task.id,patch);if(result?.syncStatus!=='verified')throw new Error('写入结果尚未通过复读验证');closeModal();toast('任务状态和负责人已同步到多维表格');}
+ try{const result=await window.__hmWrite('tasks','PATCH',task.id,patch);if(result?.syncStatus!=='verified')throw new Error('写入结果尚未通过复读验证');closeModal();toast(`任务已同步：${result.task.status} · ${liveOwnerNames(result.task)}`);}
  catch(error){modalError(error?.message||'任务更新失败，请稍后重试。');}
- finally{liveTaskSaving=false;const current=$('[data-live-act="task-save"]');if(current){current.disabled=false;current.textContent='保存修改';}}
+ finally{liveTaskSaving=false;const current=$('[data-live-act="task-save"]');if(current){current.textContent='保存修改';syncLiveTaskSaveState(task);}}
 }
 const liveCategoryRows=()=>liveData?.categories?.rows||[];
 const liveFirstCategories=()=>[...new Set(liveCategoryRows().map(x=>x.category))].sort((a,b)=>a.localeCompare(b,'zh-CN'));
@@ -765,9 +772,9 @@ function liveWorkloadView(){
 
 function liveSourcesView(){
  const sources=liveData?.sources?.sources||[];
- return head('DATA & RULES','数据与规则','当前已接入的数据副本及后续切换规则；原多维表保持不变。')+
- panel('当前数据源','经营和任务使用复制后的多维表；同步是读取，不代表任务写回已经启用。',`<div class="table-wrap"><table class="v9-target-table"><thead><tr><th>模块</th><th>当前表</th><th>接入方式</th><th>原表</th><th>入口</th></tr></thead><tbody>${sources.map(s=>`<tr><td><b>${esc(s.label)}</b></td><td>${esc(s.tableName)}</td><td>${B(s.mode==='demo'?'演示数据':'持续同步',s.mode==='demo'?'amber':'blue')}</td><td>${s.readOnlyOriginal?'不改动':'—'}</td><td>${s.baseUrl?`<a href="${esc(s.baseUrl)}" target="_blank" rel="noreferrer">打开副本</a>`:'待接入'}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">正在读取数据源配置…</td></tr>'}</tbody></table></div>`)+
- panel('更换多维表','未来由你选择目标表；选择前先复制候选表、检查字段和权限，再启用新连接。',`<div class="panel-body"><p>${esc(liveData?.sources?.replacementRule||'正在加载切换规则…')}</p><p>当前版本尚未提供自助切换按钮，也不会对原表写入。任务创建、改期、反馈写回及负责人触达仍待后续接通。</p></div>`);
+ return head('DATA & RULES','数据与规则','当前已接入的多维表及字段级读写边界。')+
+ panel('当前数据源','仅执行任务的状态和负责人允许受控更新；活动时间线及其他模块只读。',`<div class="table-wrap"><table class="v9-target-table"><thead><tr><th>模块</th><th>当前表</th><th>接入方式</th><th>写入边界</th><th>入口</th></tr></thead><tbody>${sources.map(s=>`<tr><td><b>${esc(s.label)}</b></td><td>${esc(s.tableName)}</td><td>${B(s.mode==='read-write'?'受控更新':'持续读取',s.mode==='read-write'?'blue':'amber')}</td><td>${s.mode==='read-write'?'仅状态、负责人':'只读'}</td><td>${s.baseUrl?`<a href="${esc(s.baseUrl)}" target="_blank" rel="noreferrer">打开表格</a>`:'待接入'}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">正在读取数据源配置…</td></tr>'}</tbody></table></div>`)+
+ panel('更换多维表','未来由你选择目标表；选择前先复制候选表、检查字段和权限，再启用新连接。',`<div class="panel-body"><p>${esc(liveData?.sources?.replacementRule||'正在加载切换规则…')}</p><p>当前版本尚未提供自助切换按钮。任务新增、删除、改期、反馈写回及负责人触达仍待后续接通。</p></div>`);
 }
 
 const v9RenderChrome=renderChrome,v9Footer=footer;
@@ -796,7 +803,7 @@ window.addEventListener('hm-live-error',()=>{liveError=true;render();});
 window.addEventListener('hm-auth-ready',e=>{localAuth=e.detail;render();});
 window.addEventListener('hm-auth-error',()=>{localAuth={configured:false,unavailable:true};render();});
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-live-act]');if(!b)return;const act=b.dataset.liveAct;if(act==='feishu-login'){window.location.href=`${window.location.protocol}//${window.location.hostname}:3001/auth/login`;}if(act==='feishu-logout'){fetch(`${window.location.protocol}//${window.location.hostname}:3001/auth/logout`,{method:'POST',credentials:'include'}).then(()=>window.location.reload());}if(act==='task-edit'){const task=liveTasks().find(t=>t.id===b.dataset.recordId);if(task)liveTaskEditor(task);}if(act==='task-save'){const task=liveTasks().find(t=>t.id===b.dataset.recordId);if(task)await saveLiveTask(task);}if(act==='task-scope'){liveTaskScope=b.dataset.scope;render();}if(act==='task-completion'||act==='task-state'){liveTaskCompletion=b.dataset.completion||b.dataset.state;render();}if(act==='range'){liveRange=b.dataset.range;render();}if(act==='tasks-calendar'){nav('calendar');}if(act==='category'){liveFirstCategory=b.dataset.first;liveSecondCategory=b.dataset.second;render();}if(act==='week'){const step=Number(b.dataset.step);if(step===0)liveWeek=liveDate();else{const d=new Date((liveWeek||liveDate())+'T00:00:00Z');d.setUTCDate(d.getUTCDate()+step);liveWeek=d.toISOString().slice(0,10);}render();}},true);
-document.addEventListener('change',e=>{if(e.target.id==='livePeriod'){liveRange=e.target.value;render();}if(e.target.id==='liveTaskStatus'){liveTaskStatus=e.target.value;render();}if(e.target.id==='liveTaskOwner'){liveTaskOwner=e.target.value;render();}if(e.target.id==='liveTaskSection'){liveTaskSection=e.target.value;render();}if(e.target.id==='liveWorkDate'){liveWorkDate=e.target.value;render();}if(e.target.id==='liveFirstCategory'){liveFirstCategory=e.target.value;liveSecondCategory='';render();}if(e.target.id==='liveSecondCategory'){liveSecondCategory=e.target.value;render();}},true);
+document.addEventListener('change',e=>{if(e.target.closest?.('#liveTaskEditForm')){const button=$('[data-live-act="task-save"]'),task=liveTasks().find(item=>item.id===button?.dataset.recordId);if(task)syncLiveTaskSaveState(task);}if(e.target.id==='livePeriod'){liveRange=e.target.value;render();}if(e.target.id==='liveTaskStatus'){liveTaskStatus=e.target.value;render();}if(e.target.id==='liveTaskOwner'){liveTaskOwner=e.target.value;render();}if(e.target.id==='liveTaskSection'){liveTaskSection=e.target.value;render();}if(e.target.id==='liveWorkDate'){liveWorkDate=e.target.value;render();}if(e.target.id==='liveFirstCategory'){liveFirstCategory=e.target.value;liveSecondCategory='';render();}if(e.target.id==='liveSecondCategory'){liveSecondCategory=e.target.value;render();}},true);
 document.addEventListener('input',e=>{if(e.target.id==='liveTaskSearch'){const value=e.target.value;liveTaskSearch=value;const pos=e.target.selectionStart;render();const input=$('#liveTaskSearch');input?.focus();input?.setSelectionRange(pos,pos);}},true);
 
 window.HMDemo={getState:()=>C.clone(S),getUI:()=>({...U}),core:C,domain:D,analytics:A,exporter:E};

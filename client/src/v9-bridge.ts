@@ -8,7 +8,7 @@ import './live-task-model.mjs';
 declare global {
   interface Window {
     __hmConfirm: (message: string) => Promise<boolean>;
-    __hmWrite: (moduleName: 'tasks' | 'timeline', method: 'POST' | 'PATCH' | 'DELETE', recordId?: string, body?: Record<string, unknown> | null) => Promise<unknown>;
+    __hmWrite: (moduleName: 'tasks', method: 'PATCH', recordId: string, body: { status?: string; responsibleOpenIds?: string[] }) => Promise<{ recordId: string; syncStatus: 'verified'; task: TasksDashboardResponse['tasks'][number] }>;
   }
 }
 
@@ -27,7 +27,7 @@ async function loadLocalFeishuIdentity() {
   }
 }
 
-async function loadWorkbench() {
+async function loadWorkbench(strict = false) {
   try {
     const requestWorkbench = async (name: string) => {
       if (!isLocalPreview) return axiosForBackend({ url: `/api/workbench/${name}`, method: 'GET' });
@@ -52,11 +52,12 @@ async function loadWorkbench() {
   } catch (error) {
     logger.error('工作台真实数据加载失败', error);
     window.dispatchEvent(new CustomEvent('hm-live-error'));
+    if (strict) throw error;
   }
 }
 
 window.__hmConfirm = showConfirm;
-window.__hmWrite = createWorkbenchWriter({ baseUrl: localAuthBase, refresh: loadWorkbench });
+window.__hmWrite = createWorkbenchWriter({ baseUrl: localAuthBase, refresh: () => loadWorkbench(true) });
 
 const runtime = document.createElement('script');
 runtime.src = new URL('./v9-runtime.js', import.meta.url).href;

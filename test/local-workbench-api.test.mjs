@@ -77,3 +77,42 @@ test('disables timeline writes and maps safe task update diagnostics', async () 
     body: { error: { kind: 'verification_mismatch', code: 'READBACK_MISMATCH' } },
   });
 });
+
+test('invalidates task caches even when a write reaches readback mismatch', async () => {
+  let reads = 0;
+  const mismatch = Object.assign(new Error('mismatch'), { kind: 'verification_mismatch', code: 'READBACK_MISMATCH' });
+  const api = createWorkbenchApi({
+    core: { async getOverview() { return {}; } },
+    tasks: {
+      async getTasks() { reads += 1; return { tasks: [{ id: String(reads) }] }; },
+      async updateTask() { throw mismatch; },
+    },
+    targets: { async getTargets() { return {}; } },
+    timeline: { async getTimeline() { return {}; } },
+  }, { cacheTtlMs: 5000, now: () => 1000 });
+  const viewer = { id: 'ou_1', name: '操作人', role: 'member' };
+
+  assert.equal((await api.handle('GET', '/api/workbench/tasks')).body.tasks[0].id, '1');
+  assert.equal((await api.handle('GET', '/api/workbench/tasks')).body.readStatus.cached, true);
+  assert.equal((await api.handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '进行中' })).status, 409);
+  assert.equal((await api.handle('GET', '/api/workbench/tasks')).body.tasks[0].id, '2');
+});
+
+test('maps stale task choices and missing records to stable public diagnostics', async () => {
+  const viewer = { id: 'ou_1', name: '操作人', role: 'member' };
+  const createApi = (failure) => createWorkbenchApi({
+    core: { async getOverview() { return {}; } },
+    tasks: { async getTasks() { return {}; }, async updateTask() { throw failure; } },
+    targets: { async getTargets() { return {}; } },
+    timeline: { async getTimeline() { return {}; } },
+  });
+
+  const staleStatus = Object.assign(new Error('状态选项已失效'), { kind: 'invalid_task_update', code: 'STALE_STATUS' });
+  const staleOwner = Object.assign(new Error('负责人选项已失效'), { kind: 'invalid_task_update', code: 'STALE_OWNER' });
+  const missing = Object.assign(new Error('记录不存在'), { kind: 'invalid_task_update', code: 'RECORD_NOT_FOUND' });
+  assert.deepEqual(await createApi(staleStatus).handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '旧状态' }), {
+    status: 409, body: { error: { kind: 'invalid_task_update', code: 'STALE_STATUS' } },
+  });
+  assert.equal((await createApi(staleOwner).handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { responsibleOpenIds: ['ou_old'] })).status, 409);
+  assert.equal((await createApi(missing).handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '进行中' })).status, 404);
+});
