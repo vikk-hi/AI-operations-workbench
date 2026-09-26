@@ -14,7 +14,7 @@ const child = spawn('npx', [
   'magenta,green',
   '--kill-others-on-fail',
   'npm run dev:auth',
-  'npm run dev:client',
+  'npm run dev:client -- --host 127.0.0.1',
 ], { stdio: 'inherit', env: process.env });
 
 child.on('exit', (code) => process.exit(code ?? 0));

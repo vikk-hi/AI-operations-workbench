@@ -68,3 +68,8 @@ test('local preview uses the localhost workbench API while online keeps Miaoda t
   assert.match(bridge, /axiosForBackend/);
   assert.doesNotMatch(bridge, /method:\s*['"](?:POST|PATCH|DELETE)['"][\s\S]*\/api\/workbench/);
 });
+
+test('combined local launcher binds the client to the documented IPv4 address', async () => {
+  const launcher = await readFile(new URL('../scripts/dev-local-web.js', import.meta.url), 'utf8');
+  assert.match(launcher, /npm run dev:client -- --host 127\.0\.0\.1/);
+});
