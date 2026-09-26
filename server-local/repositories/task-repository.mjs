@@ -21,6 +21,30 @@ const people = (value) => {
   });
 };
 
+const nonEmptyText = (value) => typeof value === 'string' && value.trim() ? value.trim() : null;
+const recordId = (value) => {
+  const id = nonEmptyText(value);
+  if (!id) throw new Error('记录 ID 不能为空');
+  return id;
+};
+const writableTaskFields = (input, { creating = false } = {}) => {
+  const fields = {};
+  if ('title' in input || creating) {
+    const title = nonEmptyText(input.title);
+    if (!title) throw new Error('任务标题不能为空');
+    fields.任务事项 = title;
+  }
+  const section = nonEmptyText(input.section);
+  const status = nonEmptyText(input.status);
+  if (section) fields.板块 = section;
+  if (status) fields.状态 = status;
+  if (Array.isArray(input.responsibleOpenIds)) {
+    fields.负责人 = [...new Set(input.responsibleOpenIds.map(nonEmptyText).filter(Boolean))].map((id) => ({ id }));
+  }
+  if (!creating && Object.keys(fields).length === 0) throw new Error('没有可更新的任务字段');
+  return fields;
+};
+
 export function createTaskRepository({ client, source, now = () => new Date() }) {
   return Object.freeze({
     async getTasks(viewer) {
@@ -53,10 +77,24 @@ export function createTaskRepository({ client, source, now = () => new Date() })
       return {
         tasks,
         templates: [],
-        source: { tasksUrl: baseUrl, templatesUrl: '', readOnly: true },
+        source: { tasksUrl: baseUrl, templatesUrl: '', readOnly: false, writable: true },
         viewer: viewer ?? null,
-        readStatus: { sourceKey: source.key, mode: 'live-readonly', lastReadAt: now().toISOString(), recordCount: records.length, cached: false, warnings: ['任务模板表尚未单独映射'] },
+        readStatus: { sourceKey: source.key, mode: 'live-readwrite', lastReadAt: now().toISOString(), recordCount: records.length, cached: false, warnings: ['任务模板表尚未单独映射'] },
       };
+    },
+    async createTask(input) {
+      const record = await client.createRecord(source.appToken, source.tableId, writableTaskFields(input ?? {}, { creating: true }));
+      return { recordId: record.record_id };
+    },
+    async updateTask(id, input) {
+      const normalizedId = recordId(id);
+      const record = await client.updateRecord(source.appToken, source.tableId, normalizedId, writableTaskFields(input ?? {}));
+      return { recordId: record.record_id };
+    },
+    async deleteTask(id) {
+      const normalizedId = recordId(id);
+      await client.deleteRecord(source.appToken, source.tableId, normalizedId);
+      return { recordId: normalizedId, deleted: true };
     },
   });
 }

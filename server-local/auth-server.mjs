@@ -20,6 +20,7 @@ import { createTaskRepository } from './repositories/task-repository.mjs';
 import { createTargetRepository } from './repositories/target-repository.mjs';
 import { createTimelineRepository } from './repositories/timeline-repository.mjs';
 import { createWorkbenchApi } from './workbench-api.mjs';
+import { readJsonBody } from './http-json.mjs';
 
 for (const candidate of [path.resolve('.env.local'), path.resolve('../..', '.env.local')]) {
   if (existsSync(candidate)) { dotenv.config({ path: candidate, quiet: true }); break; }
@@ -43,9 +44,9 @@ const workbenchApi = createWorkbenchApi({
     sources: Object.values(bitableConfig.sources).filter((source) => source.enabled).map((source) => ({
       key: source.key, label: source.label,
       baseUrl: `https://qingmutec.feishu.cn/base/${source.appToken}?table=${source.tableId}`,
-      tableName: source.label, mode: 'continuous-sync', readOnlyOriginal: true,
+      tableName: source.label, mode: source.writable ? 'read-write' : 'continuous-sync', readOnlyOriginal: source.readOnly,
     })),
-    replacementRule: '本地通过飞书开放 API 只读访问原始多维表格，不依赖妙搭数据库',
+    replacementRule: '本地通过飞书开放 API 访问原始多维表格；任务和活动时间线受控读写，核心经营与目标数据只读',
   },
 });
 
@@ -76,7 +77,8 @@ const server = http.createServer(async (request, response) => {
     response.writeHead(204, {
       'access-control-allow-origin': origin,
       'access-control-allow-credentials': 'true',
-      'access-control-allow-methods': 'GET,POST,OPTIONS',
+      'access-control-allow-methods': 'GET,POST,PATCH,DELETE,OPTIONS',
+      'access-control-allow-headers': 'content-type',
     });
     return response.end();
   }
@@ -134,7 +136,15 @@ const server = http.createServer(async (request, response) => {
     const sessionId = cookie(request, 'hm_feishu_session');
     const user = sessionId ? sessions.get(tokenDigest(sessionId)) : null;
     const viewer = user ? { id: user.openId, name: user.name, role: 'member' } : null;
-    const result = await workbenchApi.handle(request.method || 'GET', url.pathname, viewer);
+    let body = null;
+    if (request.method === 'POST' || request.method === 'PATCH') {
+      try {
+        body = await readJsonBody(request);
+      } catch (error) {
+        return json(response, 400, { error: error instanceof Error ? error.message : '请求内容无效' }, origin);
+      }
+    }
+    const result = await workbenchApi.handle(request.method || 'GET', url.pathname, viewer, body);
     return json(response, result.status, result.body, origin);
   }
 

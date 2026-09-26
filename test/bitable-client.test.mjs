@@ -100,13 +100,26 @@ test('client normalizes rate limits and redacts credentials', async () => {
   });
 });
 
-test('client exposes no mutation methods', () => {
+test('client sends create, update and delete record requests with field payloads', async () => {
+  const calls = [];
   const client = createBitableClient({
     tokenProvider: { async getToken() { return 'token'; }, invalidate() {} },
-    fetchImpl: async () => json({ code: 0, data: { items: [] } }),
+    fetchImpl: async (url, init) => {
+      calls.push({ url, init });
+      const recordId = init.method === 'POST' ? 'rec_created' : 'rec_1';
+      return json({ code: 0, data: init.method === 'DELETE' ? {} : { record: { record_id: recordId, fields: JSON.parse(init.body).fields } } });
+    },
   });
 
-  assert.equal(client.createRecord, undefined);
-  assert.equal(client.updateRecord, undefined);
-  assert.equal(client.deleteRecord, undefined);
+  const created = await client.createRecord('base', 'table', { 任务事项: '新任务' });
+  const updated = await client.updateRecord('base', 'table', 'rec_1', { 状态: '进行中' });
+  const removed = await client.deleteRecord('base', 'table', 'rec_1');
+
+  assert.equal(created.record_id, 'rec_created');
+  assert.equal(updated.fields.状态, '进行中');
+  assert.deepEqual(removed, { recordId: 'rec_1', deleted: true });
+  assert.deepEqual(calls.map(({ init }) => init.method), ['POST', 'PUT', 'DELETE']);
+  assert.deepEqual(JSON.parse(calls[0].init.body), { fields: { 任务事项: '新任务' } });
+  assert.match(calls[1].url, /records\/rec_1$/);
+  assert.equal(calls[2].init.body, undefined);
 });

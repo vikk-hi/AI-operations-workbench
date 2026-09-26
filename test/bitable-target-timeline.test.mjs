@@ -33,3 +33,26 @@ test('normalizes D11 timeline dates, owners, completion and one selected target'
   assert.equal(result.rows[0].completed, true);
   assert.equal(result.rows[0].activityStart, '2026-10-15');
 });
+
+test('creates, updates and deletes timeline records through an explicit field allowlist', async () => {
+  const writes = [];
+  let deleted = '';
+  const repository = createTimelineRepository({
+    source: { key: 'timeline', appToken: 'base', tableId: 'table' },
+    client: {
+      async createRecord(_app, _table, fields) { writes.push(fields); return { record_id: 'time_new' }; },
+      async updateRecord(_app, _table, recordId, fields) { writes.push(fields); return { record_id: recordId }; },
+      async deleteRecord(_app, _table, recordId) { deleted = recordId; return { deleted: true }; },
+    },
+  });
+
+  assert.deepEqual(await repository.createTimelineItem({ activity: '双11抢先购', activityStart: '2026-10-15', activityEnd: '2026-10-19', item: '素材确认', itemStart: '2026-10-01', itemEnd: '2026-10-02', responsibleOpenIds: ['ou_1'] }, { id: 'ou_actor' }), { recordId: 'time_new' });
+  assert.deepEqual(await repository.updateTimelineItem('time_new', { completed: true, itemEnd: '2026-10-03', ignored: true }, { id: 'ou_actor' }), { recordId: 'time_new' });
+  assert.deepEqual(await repository.deleteTimelineItem('time_new', { id: 'ou_actor' }), { recordId: 'time_new', deleted: true });
+  assert.deepEqual(writes, [
+    { 活动名称: '双11抢先购', 事项: '素材确认', 活动开始日期: Date.UTC(2026, 9, 15), 活动结束日期: Date.UTC(2026, 9, 19), 事项开始日期: Date.UTC(2026, 9, 1), 事项结束日期: Date.UTC(2026, 9, 2), 测试人员: [{ id: 'ou_1' }] },
+    { 是否完成: true, 事项结束日期: Date.UTC(2026, 9, 3) },
+  ]);
+  assert.equal(deleted, 'time_new');
+  await assert.rejects(repository.createTimelineItem({ activity: '双11抢先购', item: '无效日期', itemStart: '2026-02-31' }), /有效日期/);
+});

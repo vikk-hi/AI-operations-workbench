@@ -16,6 +16,9 @@ test('loads only allowlisted sources', () => {
   assert.equal(resolveSource(config, 'tasks').appToken, 'O4XhbiUw2aa5yRsgR8fckrNpnXe');
   assert.equal(resolveSource(config, 'tasks').tableId, 'tbl1Hi7UvvXTzTiQ');
   assert.equal(resolveSource(config, 'timeline').tableId, 'tbl2bLwV4QSLDVYL');
+  assert.equal(resolveSource(config, 'tasks').writable, true);
+  assert.equal(resolveSource(config, 'timeline').writable, true);
+  assert.equal(resolveSource(config, 'core').writable, false);
   assert.equal(resolveSource(config, 'companyTargets').tableId, 'tbl74NgTMPJdwQXH');
   assert.equal(config.sources.coreHistory.enabled, false);
   assert.equal(config.sources.taskTemplates.enabled, false);

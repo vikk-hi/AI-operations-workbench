@@ -2,10 +2,12 @@ import { showConfirm } from '@lark-apaas/client-toolkit';
 import { logger } from '@lark-apaas/client-toolkit/logger';
 import { axiosForBackend } from '@lark-apaas/client-toolkit/utils/getAxiosForBackend';
 import type { CategoryResponse, CoreOverviewResponse, DataSourcesResponse, ProductSourceResponse, TargetProgressResponse, TasksDashboardResponse, TimelineResponse } from '@shared/api.interface';
+import { createWorkbenchWriter } from './workbench-write.mjs';
 
 declare global {
   interface Window {
     __hmConfirm: (message: string) => Promise<boolean>;
+    __hmWrite: (moduleName: 'tasks' | 'timeline', method: 'POST' | 'PATCH' | 'DELETE', recordId?: string, body?: Record<string, unknown> | null) => Promise<unknown>;
   }
 }
 
@@ -53,6 +55,7 @@ async function loadWorkbench() {
 }
 
 window.__hmConfirm = showConfirm;
+window.__hmWrite = createWorkbenchWriter({ baseUrl: localAuthBase, refresh: loadWorkbench });
 
 const runtime = document.createElement('script');
 runtime.src = new URL('./v9-runtime.js', import.meta.url).href;

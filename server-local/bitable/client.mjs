@@ -20,13 +20,17 @@ function errorKind(status, code) {
 }
 
 export function createBitableClient({ tokenProvider, fetchImpl = fetch }) {
-  const request = async (path, retried = false) => {
+  const request = async (path, options = {}, retried = false) => {
     const token = await tokenProvider.getToken();
     let response;
     try {
       response = await fetchImpl(`${API_ROOT}${path}`, {
-        method: 'GET',
-        headers: { authorization: `Bearer ${token}` },
+        method: options.method ?? 'GET',
+        headers: {
+          authorization: `Bearer ${token}`,
+          ...(options.body === undefined ? {} : { 'content-type': 'application/json; charset=utf-8' }),
+        },
+        ...(options.body === undefined ? {} : { body: JSON.stringify(options.body) }),
       });
     } catch {
       throw new BitableError('network', 'NETWORK', 0);
@@ -38,7 +42,7 @@ export function createBitableClient({ tokenProvider, fetchImpl = fetch }) {
       const kind = errorKind(response.status, code);
       if (kind === 'unauthorized' && !retried) {
         tokenProvider.invalidate();
-        return request(path, true);
+        return request(path, options, true);
       }
       throw new BitableError(kind, code, response.status);
     }
@@ -80,5 +84,25 @@ export function createBitableClient({ tokenProvider, fetchImpl = fetch }) {
     return data.items.slice(0, limit).map((record) => record.record_id).filter(Boolean);
   };
 
-  return Object.freeze({ listTables, listFields, listAllRecords, listRecordIds });
+  const recordPath = (appToken, tableId, recordId = '') =>
+    `/apps/${encodeURIComponent(appToken)}/tables/${encodeURIComponent(tableId)}/records${recordId ? `/${encodeURIComponent(recordId)}` : ''}`;
+
+  const createRecord = async (appToken, tableId, fields) => {
+    const data = await request(recordPath(appToken, tableId), { method: 'POST', body: { fields } });
+    if (!data.record?.record_id) throw new BitableError('malformed_payload', 'MISSING_RECORD', 200);
+    return data.record;
+  };
+
+  const updateRecord = async (appToken, tableId, recordId, fields) => {
+    const data = await request(recordPath(appToken, tableId, recordId), { method: 'PUT', body: { fields } });
+    if (!data.record?.record_id) throw new BitableError('malformed_payload', 'MISSING_RECORD', 200);
+    return data.record;
+  };
+
+  const deleteRecord = async (appToken, tableId, recordId) => {
+    await request(recordPath(appToken, tableId, recordId), { method: 'DELETE' });
+    return { recordId, deleted: true };
+  };
+
+  return Object.freeze({ listTables, listFields, listAllRecords, listRecordIds, createRecord, updateRecord, deleteRecord });
 }

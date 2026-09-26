@@ -61,12 +61,16 @@ test('local workbench exposes real Feishu login and logout controls', async () =
   assert.match(adapter, /data-live-act="feishu-logout"/);
 });
 
-test('local preview uses the localhost workbench API while online keeps Miaoda transport', async () => {
-  const bridge = await readFile(new URL('../client/src/v9-bridge.ts', import.meta.url), 'utf8');
+test('local preview reads through localhost and exposes the allowlisted writer', async () => {
+  const [bridge, writer] = await Promise.all([
+    readFile(new URL('../client/src/v9-bridge.ts', import.meta.url), 'utf8'),
+    readFile(new URL('../client/src/workbench-write.mjs', import.meta.url), 'utf8'),
+  ]);
   assert.match(bridge, /isLocalPreview[\s\S]*localAuthBase/);
   assert.match(bridge, /fetch\(`\$\{localAuthBase\}\/api\/workbench/);
   assert.match(bridge, /axiosForBackend/);
-  assert.doesNotMatch(bridge, /method:\s*['"](?:POST|PATCH|DELETE)['"][\s\S]*\/api\/workbench/);
+  assert.match(bridge, /createWorkbenchWriter/);
+  assert.match(writer, /tasks.*timeline/);
 });
 
 test('combined local launcher binds the client to the documented IPv4 address', async () => {
