@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import * as taskModel from '../client/src/live-task-model.mjs';
+
 import {
   buildBitableRecordUrl,
   buildTaskPatch,
@@ -17,6 +19,7 @@ const tasks = [
   { id: 'rec_2', title: '活动复盘', status: '进行中', section: '活动', category: '大促', subgroup: null, notes: null, responsiblePeople: [{ id: 'ou_other', name: '运营乙' }] },
   { id: 'rec_3', title: '归档报告', status: '已完成', section: '经营', category: '报告', subgroup: null, notes: null, responsiblePeople: [{ id: 'ou_me', name: '运营甲' }] },
   { id: 'rec_4', title: '未分派事项', status: '待处理', section: null, category: null, subgroup: null, notes: null, responsiblePeople: [] },
+  { id: 'rec_5', title: '团队归档', status: '已完成', section: '活动', category: '报告', subgroup: null, notes: null, responsiblePeople: [{ id: 'ou_other', name: '运营乙' }] },
 ];
 
 test('defaults to the signed-in user unfinished tasks and handles no assignments', () => {
@@ -32,6 +35,21 @@ test('supports all-task scope and exact task filters with case-insensitive searc
   assert.deepEqual(filterTasks(tasks, { scope: 'all', completion: 'all', ownerId: 'ou_me', section: '经营' }).map((task) => task.id), ['rec_1', 'rec_3']);
   assert.deepEqual(filterTasks(tasks, { scope: 'all', completion: 'all', search: 'gmv' }).map((task) => task.id), ['rec_1']);
   assert.deepEqual(filterTasks(tasks, { scope: 'all', completion: 'all', search: 'REC_2' }).map((task) => task.id), ['rec_2']);
+});
+
+test('combines personal or team scope with incomplete or completed work', () => {
+  assert.deepEqual(taskModel.taskScopeOptions, [
+    { value: 'mine', label: '我的工作' },
+    { value: 'all', label: '团队工作' },
+  ]);
+  assert.deepEqual(taskModel.taskCompletionOptions, [
+    { value: 'open', label: '未完成' },
+    { value: 'ended', label: '已完成' },
+  ]);
+  assert.deepEqual(filterTasks(tasks, { scope: 'mine', viewerId: 'ou_me', completion: 'open' }).map((task) => task.id), ['rec_1']);
+  assert.deepEqual(filterTasks(tasks, { scope: 'mine', viewerId: 'ou_me', completion: 'ended' }).map((task) => task.id), ['rec_3']);
+  assert.deepEqual(filterTasks(tasks, { scope: 'all', viewerId: 'ou_me', completion: 'open' }).map((task) => task.id), ['rec_1', 'rec_2', 'rec_4']);
+  assert.deepEqual(filterTasks(tasks, { scope: 'all', viewerId: 'ou_me', completion: 'ended' }).map((task) => task.id), ['rec_3', 'rec_5']);
 });
 
 test('builds stable filter choices without merging duplicate names', () => {

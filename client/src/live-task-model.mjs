@@ -3,6 +3,16 @@ const clean = (value) => typeof value === 'string' ? value.trim() : '';
 const unique = (values) => [...new Set(values)];
 const stableIds = (values) => unique(values.map(clean).filter(Boolean)).sort((left, right) => left.localeCompare(right));
 
+export const taskScopeOptions = Object.freeze([
+  Object.freeze({ value: 'mine', label: '我的工作' }),
+  Object.freeze({ value: 'all', label: '团队工作' }),
+]);
+
+export const taskCompletionOptions = Object.freeze([
+  Object.freeze({ value: 'open', label: '未完成' }),
+  Object.freeze({ value: 'ended', label: '已完成' }),
+]);
+
 export const isTaskComplete = (task) => completePattern.test(clean(task?.status));
 
 export function filterTasks(tasks, filters = {}) {
@@ -96,5 +106,5 @@ export function buildBitableRecordUrl(baseUrl, recordId) {
 }
 
 if (typeof window !== 'undefined') {
-  window.__hmTaskModel = Object.freeze({ isTaskComplete, filterTasks, taskFilterOptions, createTaskEditDraft, currentSelectChoice, reconcileTaskEditDraft, buildTaskPatch, buildBitableRecordUrl });
+  window.__hmTaskModel = Object.freeze({ taskScopeOptions, taskCompletionOptions, isTaskComplete, filterTasks, taskFilterOptions, createTaskEditDraft, currentSelectChoice, reconcileTaskEditDraft, buildTaskPatch, buildBitableRecordUrl });
 }
