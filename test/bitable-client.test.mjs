@@ -60,6 +60,32 @@ test('client reads every record page exactly once', async () => {
   assert.match(urls[1], /page_token=next-page/);
 });
 
+test('record id probe reads at most three records and returns no field values', async () => {
+  let requestedUrl = '';
+  const client = createBitableClient({
+    tokenProvider: { async getToken() { return 'token'; }, invalidate() {} },
+    fetchImpl: async (url) => {
+      requestedUrl = String(url);
+      return json({
+        code: 0,
+        data: {
+          items: [
+            { record_id: 'rec_1', fields: { secret: 'one' } },
+            { record_id: 'rec_2', fields: { secret: 'two' } },
+            { record_id: 'rec_3', fields: { secret: 'three' } },
+            { record_id: 'rec_4', fields: { secret: 'four' } },
+          ],
+          has_more: true,
+          page_token: 'unused',
+        },
+      });
+    },
+  });
+
+  assert.deepEqual(await client.listRecordIds('app_token', 'table_id', { limit: 3 }), ['rec_1', 'rec_2', 'rec_3']);
+  assert.match(requestedUrl, /page_size=3/);
+});
+
 test('client normalizes rate limits and redacts credentials', async () => {
   const client = createBitableClient({
     tokenProvider: { async getToken() { return 'sensitive-token'; }, invalidate() {} },

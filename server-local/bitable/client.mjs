@@ -72,5 +72,13 @@ export function createBitableClient({ tokenProvider, fetchImpl = fetch }) {
     return records;
   };
 
-  return Object.freeze({ listTables, listFields, listAllRecords });
+  const listRecordIds = async (appToken, tableId, options = {}) => {
+    const limit = Math.min(3, Math.max(1, Number(options.limit || 3)));
+    const params = new URLSearchParams({ page_size: String(limit) });
+    const data = await request(`/apps/${encodeURIComponent(appToken)}/tables/${encodeURIComponent(tableId)}/records?${params}`);
+    if (!Array.isArray(data.items)) throw new BitableError('malformed_payload', 'MISSING_ITEMS', 200);
+    return data.items.slice(0, limit).map((record) => record.record_id).filter(Boolean);
+  };
+
+  return Object.freeze({ listTables, listFields, listAllRecords, listRecordIds });
 }
