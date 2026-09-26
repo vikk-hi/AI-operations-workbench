@@ -9,6 +9,21 @@ declare global {
   }
 }
 
+const isLocalPreview = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
+const localAuthBase = `${window.location.protocol}//${window.location.hostname}:3001`;
+
+async function loadLocalFeishuIdentity() {
+  if (!isLocalPreview) return;
+  try {
+    const response = await fetch(`${localAuthBase}/auth/status`, { credentials: 'include' });
+    const detail = await response.json();
+    window.dispatchEvent(new CustomEvent('hm-auth-ready', { detail }));
+  } catch (error) {
+    logger.error('本地飞书身份服务不可用', error);
+    window.dispatchEvent(new CustomEvent('hm-auth-error'));
+  }
+}
+
 async function loadWorkbench() {
   try {
     const [overview, tasks, sources, categories, products, targets, timeline] = await Promise.all([
@@ -39,7 +54,10 @@ window.__hmConfirm = showConfirm;
 
 const runtime = document.createElement('script');
 runtime.src = new URL('./v9-runtime.js', import.meta.url).href;
-runtime.onload = () => { void loadWorkbench(); };
+runtime.onload = () => {
+  void loadLocalFeishuIdentity();
+  void loadWorkbench();
+};
 runtime.onerror = () => {
   const main = document.querySelector('#main');
   if (main) main.textContent = '工作台资源加载失败，请刷新后重试。';
