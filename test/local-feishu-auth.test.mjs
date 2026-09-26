@@ -61,7 +61,7 @@ test('local workbench exposes real Feishu login and logout controls', async () =
   assert.match(adapter, /data-live-act="feishu-logout"/);
 });
 
-test('local preview reads through localhost and exposes only task PATCH writes', async () => {
+test('local preview reads through localhost and exposes only task POST and PATCH writes', async () => {
   const [bridge, writer] = await Promise.all([
     readFile(new URL('../client/src/v9-bridge.ts', import.meta.url), 'utf8'),
     readFile(new URL('../client/src/workbench-write.mjs', import.meta.url), 'utf8'),
@@ -71,16 +71,28 @@ test('local preview reads through localhost and exposes only task PATCH writes',
   assert.match(bridge, /axiosForBackend/);
   assert.match(bridge, /createWorkbenchWriter/);
   assert.match(bridge, /refresh:\s*\(\)\s*=>\s*loadWorkbench\(true\)/);
-  assert.match(writer, /moduleName !== 'tasks' \|\| method !== 'PATCH'/);
+  assert.match(writer, /\['POST', 'PATCH'\]\.includes\(method\)/);
   assert.doesNotMatch(writer, /timeline/);
 });
 
-test('live task adapter exposes verified editing without create, delete, or timeline writes', async () => {
+test('live task adapter exposes verified create and edit flows without delete or timeline writes', async () => {
   const adapter = await readFile(new URL('../client/v9-source/live-adapter.js', import.meta.url), 'utf8');
+  assert.match(adapter, /data-live-act="task-create"/);
+  assert.match(adapter, /id="liveTaskCreateForm"/);
+  assert.match(adapter, /name="title"/);
+  assert.match(adapter, /name="responsibleOpenIds"/);
+  assert.match(adapter, /name="section"/);
+  assert.match(adapter, /name="category"/);
+  assert.match(adapter, /name="subgroup"/);
+  assert.match(adapter, /name="status"/);
+  assert.match(adapter, /name="notes"/);
+  assert.match(adapter, /__hmWrite\('tasks','POST'/);
+  assert.match(adapter, /error\?\.committed/);
+  assert.match(adapter, /liveTaskStatus='';liveTaskOwner='';liveTaskSection=''/);
   assert.match(adapter, /data-live-act="task-edit"/);
   assert.match(adapter, /__hmWrite\('tasks','PATCH'/);
   assert.match(adapter, /syncStatus!=='verified'/);
-  assert.doesNotMatch(adapter, /live-task-create|task-delete|live-timeline-create|timeline-toggle|timeline-delete/);
+  assert.doesNotMatch(adapter, /task-delete|live-timeline-create|timeline-toggle|timeline-delete/);
   assert.doesNotMatch(adapter, /window\.prompt/);
   assert.match(adapter, /data-live-act="task-save"[^>]*disabled/);
   assert.match(adapter, /reconcileTaskEditDraft/);

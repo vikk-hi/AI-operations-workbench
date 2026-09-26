@@ -38,6 +38,7 @@ test('maps tasks, multiple owners, links, and honest people status', async () =>
     { id: 'ou_1', name: '春豌' },
     { id: 'ou_2', name: '同名人员' },
     { id: 'ou_3', name: '同名人员' },
+    { id: 'ou_viewer', name: 'Viewer' },
   ]);
   assert.equal(result.viewer.name, 'Viewer');
   assert.equal(result.source.readOnly, false);
@@ -94,7 +95,6 @@ test('updates only valid task status and verifies the fresh record', async () =>
   assert.equal(result.recordId, 'rec_1');
   assert.equal(result.syncStatus, 'verified');
   assert.equal(result.task.status, '进行中');
-  assert.equal(repository.createTask, undefined);
   assert.equal(repository.deleteTask, undefined);
 });
 
@@ -151,4 +151,134 @@ test('reports a diagnostic when Bitable readback does not match the submitted up
     assert.equal(error.code, 'READBACK_MISMATCH');
     return true;
   });
+});
+
+test('creates an allowlisted task record and verifies every submitted field from Bitable', async () => {
+  const records = [{
+    record_id: 'rec_owner_choices',
+    fields: { 任务事项: '候选负责人来源', 负责人: [{ id: 'ou_1', name: '春豌' }, { id: 'ou_2', name: '榅桲' }], 状态: '待处理' },
+  }];
+  const creates = [];
+  const client = {
+    async listFields() { return definitions; },
+    async listAllRecords() { return records; },
+    async createRecord(_app, _table, fields) {
+      creates.push(fields);
+      const record = {
+        record_id: 'rec_new',
+        fields: {
+          ...fields,
+          负责人: fields.负责人.map(({ id }) => ({ id, name: peopleById.get(id) })),
+        },
+      };
+      records.push(record);
+      return record;
+    },
+    async getRecord(_app, _table, recordId) { return records.find((record) => record.record_id === recordId); },
+  };
+  const repository = createTaskRepository({ client, source: { key: 'tasks', appToken: 'base', tableId: 'table' } });
+
+  const result = await repository.createTask({
+    title: '准备周报',
+    responsibleOpenIds: ['ou_1', 'ou_2', 'ou_1'],
+    section: '经营',
+    category: '日报',
+    subgroup: '复盘',
+    status: '待处理',
+    notes: '核对完整日数据',
+  }, { id: 'ou_actor' });
+
+  assert.deepEqual(creates, [{
+    任务事项: '准备周报',
+    负责人: [{ id: 'ou_1' }, { id: 'ou_2' }],
+    板块: '经营',
+    事项分类: '日报',
+    子分组: '复盘',
+    状态: '待处理',
+    备注: '核对完整日数据',
+  }]);
+  assert.equal(result.recordId, 'rec_new');
+  assert.equal(result.syncStatus, 'verified');
+  assert.equal(result.task.title, '准备周报');
+  assert.deepEqual(result.task.responsiblePeople.map(({ id }) => id), ['ou_1', 'ou_2']);
+  assert.equal(result.task.subgroup, '复盘');
+  assert.equal(result.task.notes, '核对完整日数据');
+});
+
+test('allows the signed-in viewer as the default owner even before they appear in task records', async () => {
+  const records = [{ record_id: 'rec_existing', fields: { 任务事项: '旧任务', 负责人: [], 状态: '待处理' } }];
+  const client = {
+    async listFields() { return definitions; },
+    async listAllRecords() { return records; },
+    async createRecord(_app, _table, fields) {
+      records.push({ record_id: 'rec_new', fields: { ...fields, 负责人: [{ id: 'ou_new', name: '新成员' }] } });
+      return { record_id: 'rec_new' };
+    },
+    async getRecord() { return records.at(-1); },
+  };
+  const repository = createTaskRepository({ client, source: { key: 'tasks', appToken: 'base', tableId: 'table' } });
+
+  const result = await repository.createTask({ title: '新人任务', responsibleOpenIds: ['ou_new'], status: '待处理' }, { id: 'ou_new', name: '新成员' });
+
+  assert.deepEqual(result.task.responsiblePeople, [{ id: 'ou_new', name: '新成员' }]);
+});
+
+test('validates every create field before sending a Bitable write', async () => {
+  let creates = 0;
+  const repository = createTaskRepository({
+    source: { key: 'tasks', appToken: 'base', tableId: 'table' },
+    client: {
+      async listFields() { return definitions.filter((definition) => definition.field_name !== '备注'); },
+      async listAllRecords() { return []; },
+      async createRecord() { creates += 1; return { record_id: 'rec_new' }; },
+    },
+  });
+
+  await assert.rejects(repository.createTask({ title: '新任务', status: '待处理' }, { id: 'ou_new', name: '新成员' }), /备注/);
+  assert.equal(creates, 0);
+});
+
+test('reports the committed record id when create readback cannot be verified', async () => {
+  const repository = createTaskRepository({
+    source: { key: 'tasks', appToken: 'base', tableId: 'table' },
+    client: {
+      async listFields() { return definitions; },
+      async listAllRecords() { return []; },
+      async createRecord() { return { record_id: 'rec_committed' }; },
+      async getRecord() { throw new Error('temporary read failure'); },
+    },
+  });
+
+  await assert.rejects(repository.createTask({ title: '已落表任务', status: '待处理' }, { id: 'ou_new', name: '新成员' }), (error) => {
+    assert.equal(error.code, 'READBACK_MISMATCH');
+    assert.equal(error.committed, true);
+    assert.equal(error.recordId, 'rec_committed');
+    return true;
+  });
+});
+
+test('rejects invalid, stale, and unknown fields before creating a task record', async () => {
+  let creates = 0;
+  const records = [{
+    record_id: 'rec_owner_choices',
+    fields: { 任务事项: '候选负责人来源', 负责人: [{ id: 'ou_1', name: '春豌' }], 状态: '待处理' },
+  }];
+  const repository = createTaskRepository({
+    source: { key: 'tasks', appToken: 'base', tableId: 'table' },
+    client: {
+      async listFields() { return definitions; },
+      async listAllRecords() { return records; },
+      async createRecord() { creates += 1; return { record_id: 'rec_new' }; },
+      async getRecord() { return { record_id: 'rec_new', fields: {} }; },
+    },
+  });
+  const valid = { title: '准备周报', responsibleOpenIds: ['ou_1'], section: '经营', category: '日报', status: '待处理' };
+
+  await assert.rejects(repository.createTask({ ...valid, title: '   ' }), (error) => error.code === 'INVALID_TITLE');
+  await assert.rejects(repository.createTask({ ...valid, extra: '越权字段' }), /不允许新增字段/);
+  await assert.rejects(repository.createTask({ ...valid, status: '已归档' }), (error) => error.code === 'STALE_STATUS');
+  await assert.rejects(repository.createTask({ ...valid, responsibleOpenIds: ['ou_missing'] }), (error) => error.code === 'STALE_OWNER');
+  await assert.rejects(repository.createTask({ ...valid, section: '旧板块' }), (error) => error.code === 'STALE_SECTION');
+  await assert.rejects(repository.createTask({ ...valid, category: '旧分类' }), (error) => error.code === 'STALE_CATEGORY');
+  assert.equal(creates, 0);
 });

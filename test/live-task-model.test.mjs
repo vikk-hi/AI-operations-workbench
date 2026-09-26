@@ -119,3 +119,39 @@ test('builds a Feishu Bitable link that opens the requested record', () => {
     'https://qingmutec.feishu.cn/base/base_token?table=table_id&view=view_id&record=rec+1',
   );
 });
+
+test('builds a new task draft from live Bitable choices and the signed-in viewer', () => {
+  assert.deepEqual(taskModel.createTaskDraft({
+    statusOptions: ['进行中', '未开始', '已完成'],
+    ownerOptions: [{ id: 'ou_me', name: '运营甲' }, { id: 'ou_other', name: '运营乙' }],
+  }, 'ou_me'), {
+    title: '',
+    responsibleOpenIds: ['ou_me'],
+    section: '',
+    category: '',
+    subgroup: '',
+    status: '未开始',
+    notes: '',
+  });
+});
+
+test('normalizes a new task form into the exact create payload', () => {
+  assert.deepEqual(taskModel.buildTaskCreatePayload({
+    title: '  准备周报  ',
+    responsibleOpenIds: ['ou_other', 'ou_me', 'ou_other'],
+    section: '',
+    category: '日报',
+    subgroup: ' 复盘 ',
+    status: '未开始',
+    notes: ' 核对完整日 ',
+  }), {
+    title: '准备周报',
+    responsibleOpenIds: ['ou_me', 'ou_other'],
+    section: null,
+    category: '日报',
+    subgroup: '复盘',
+    status: '未开始',
+    notes: '核对完整日',
+  });
+  assert.throws(() => taskModel.buildTaskCreatePayload({ title: '   ', status: '未开始' }), /任务事项/);
+});

@@ -99,6 +99,36 @@ export function buildTaskPatch(originalTask, draft) {
   return Object.keys(patch).length ? patch : null;
 }
 
+export function createTaskDraft(tasksDashboard = {}, viewerId = '') {
+  const statuses = Array.isArray(tasksDashboard.statusOptions) ? tasksDashboard.statusOptions : [];
+  const owners = Array.isArray(tasksDashboard.ownerOptions) ? tasksDashboard.ownerOptions : [];
+  const defaultStatus = statuses.includes('未开始') ? '未开始' : clean(statuses[0]);
+  const defaultOwnerId = owners.some((person) => clean(person?.id) === clean(viewerId)) ? clean(viewerId) : '';
+  return {
+    title: '',
+    responsibleOpenIds: defaultOwnerId ? [defaultOwnerId] : [],
+    section: '',
+    category: '',
+    subgroup: '',
+    status: defaultStatus,
+    notes: '',
+  };
+}
+
+export function buildTaskCreatePayload(draft = {}) {
+  const title = clean(draft.title);
+  if (!title) throw new Error('请输入任务事项');
+  return {
+    title,
+    responsibleOpenIds: stableIds(Array.isArray(draft.responsibleOpenIds) ? draft.responsibleOpenIds : []),
+    section: clean(draft.section) || null,
+    category: clean(draft.category) || null,
+    subgroup: clean(draft.subgroup),
+    status: clean(draft.status),
+    notes: clean(draft.notes),
+  };
+}
+
 export function buildBitableRecordUrl(baseUrl, recordId) {
   const url = new URL(baseUrl);
   url.searchParams.set('record', String(recordId));
@@ -106,5 +136,5 @@ export function buildBitableRecordUrl(baseUrl, recordId) {
 }
 
 if (typeof window !== 'undefined') {
-  window.__hmTaskModel = Object.freeze({ taskScopeOptions, taskCompletionOptions, isTaskComplete, filterTasks, taskFilterOptions, createTaskEditDraft, currentSelectChoice, reconcileTaskEditDraft, buildTaskPatch, buildBitableRecordUrl });
+  window.__hmTaskModel = Object.freeze({ taskScopeOptions, taskCompletionOptions, isTaskComplete, filterTasks, taskFilterOptions, createTaskEditDraft, currentSelectChoice, reconcileTaskEditDraft, buildTaskPatch, createTaskDraft, buildTaskCreatePayload, buildBitableRecordUrl });
 }

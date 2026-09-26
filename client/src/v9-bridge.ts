@@ -8,7 +8,7 @@ import './live-task-model.mjs';
 declare global {
   interface Window {
     __hmConfirm: (message: string) => Promise<boolean>;
-    __hmWrite: (moduleName: 'tasks', method: 'PATCH', recordId: string, body: { status?: string; section?: string | null; category?: string | null; responsibleOpenIds?: string[] }) => Promise<{ recordId: string; syncStatus: 'verified'; task: TasksDashboardResponse['tasks'][number] }>;
+    __hmWrite: (moduleName: 'tasks', method: 'POST' | 'PATCH', recordId: string, body: { title?: string; status?: string; section?: string | null; category?: string | null; subgroup?: string; notes?: string; responsibleOpenIds?: string[] }) => Promise<{ recordId: string; syncStatus: 'verified'; task: TasksDashboardResponse['tasks'][number] }>;
   }
 }
 

@@ -1,7 +1,14 @@
-const redactedError = (error) => ({
-  kind: typeof error?.kind === 'string' ? error.kind : 'module_error',
-  code: typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : 'UNAVAILABLE',
-});
+const redactedError = (error) => {
+  const diagnostic = {
+    kind: typeof error?.kind === 'string' ? error.kind : 'module_error',
+    code: typeof error?.code === 'string' || typeof error?.code === 'number' ? error.code : 'UNAVAILABLE',
+  };
+  if (error?.committed === true && typeof error?.recordId === 'string' && /^[A-Za-z0-9_-]{1,128}$/.test(error.recordId)) {
+    diagnostic.committed = true;
+    diagnostic.recordId = error.recordId;
+  }
+  return diagnostic;
+};
 
 export function createWorkbenchApi(repositories, options = {}) {
   const cacheTtlMs = Number(options.cacheTtlMs ?? 60_000);
@@ -39,18 +46,21 @@ export function createWorkbenchApi(repositories, options = {}) {
         }
       }
 
-      const match = /^\/api\/workbench\/tasks\/([^/]+)$/.exec(path);
-      if (method !== 'PATCH' || !match) return { status: 405, body: { error: 'Method not allowed' } };
+      const create = method === 'POST' && path === '/api/workbench/tasks';
+      const match = method === 'PATCH' ? /^\/api\/workbench\/tasks\/([^/]+)$/.exec(path) : null;
+      if (!create && !match) return { status: 405, body: { error: 'Method not allowed' } };
       if (!viewer?.id) return { status: 401, body: { error: '请先使用飞书登录' } };
-      const id = decodeURIComponent(match[1]);
       try {
-        const result = await repositories.tasks.updateTask(id, body ?? {}, viewer);
-        return { status: 200, body: result };
+        const result = create
+          ? await repositories.tasks.createTask(body ?? {}, viewer)
+          : await repositories.tasks.updateTask(decodeURIComponent(match[1]), body ?? {}, viewer);
+        return { status: create ? 201 : 200, body: result };
       } catch (error) {
         const diagnostic = redactedError(error);
         const status = diagnostic.kind === 'verification_mismatch' ? 409
           : ['STALE_STATUS', 'STALE_OWNER', 'STALE_SECTION', 'STALE_CATEGORY'].includes(diagnostic.code) ? 409
             : diagnostic.code === 'RECORD_NOT_FOUND' ? 404
+              : diagnostic.code === 'INVALID_TITLE' ? 400
           : diagnostic.kind === 'forbidden' ? 403
             : error instanceof Error && !('kind' in error) ? 400 : 503;
         return { status, body: { error: diagnostic } };

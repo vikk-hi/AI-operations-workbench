@@ -54,8 +54,30 @@ test('requires login for task PATCH, returns verified data, and invalidates ever
   assert.deepEqual(await api.handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '进行中' }), { status: 200, body: verified });
   assert.equal((await api.handle('GET', '/api/workbench/tasks')).body.tasks[0].id, '3');
   assert.equal((await api.handle('GET', '/api/workbench/tasks', viewer)).body.tasks[0].id, '4');
-  assert.equal((await api.handle('POST', '/api/workbench/tasks', viewer, { title: 'A' })).status, 405);
   assert.equal((await api.handle('DELETE', '/api/workbench/tasks/rec_1', viewer)).status, 405);
+});
+
+test('requires login for task POST, returns the verified created task, and invalidates task caches', async () => {
+  let reads = 0;
+  let received = null;
+  const verified = { recordId: 'rec_new', syncStatus: 'verified', task: { id: 'rec_new', title: '准备周报' } };
+  const api = createWorkbenchApi({
+    core: { async getOverview() { return {}; } },
+    tasks: {
+      async getTasks() { reads += 1; return { tasks: [{ id: String(reads) }] }; },
+      async createTask(body, viewer) { received = { body, viewer }; return verified; },
+    },
+    targets: { async getTargets() { return {}; } },
+    timeline: { async getTimeline() { return {}; } },
+  }, { cacheTtlMs: 5000, now: () => 1000 });
+  const viewer = { id: 'ou_1', name: '操作人', role: 'member' };
+  const body = { title: '准备周报', responsibleOpenIds: ['ou_1'], status: '待处理' };
+
+  assert.equal((await api.handle('POST', '/api/workbench/tasks', null, body)).status, 401);
+  assert.equal((await api.handle('GET', '/api/workbench/tasks', viewer)).body.tasks[0].id, '1');
+  assert.deepEqual(await api.handle('POST', '/api/workbench/tasks', viewer, body), { status: 201, body: verified });
+  assert.deepEqual(received, { body, viewer });
+  assert.equal((await api.handle('GET', '/api/workbench/tasks', viewer)).body.tasks[0].id, '2');
 });
 
 test('disables timeline writes and maps safe task update diagnostics', async () => {
@@ -96,6 +118,21 @@ test('invalidates task caches even when a write reaches readback mismatch', asyn
   assert.equal((await api.handle('GET', '/api/workbench/tasks')).body.readStatus.cached, true);
   assert.equal((await api.handle('PATCH', '/api/workbench/tasks/rec_1', viewer, { status: '进行中' })).status, 409);
   assert.equal((await api.handle('GET', '/api/workbench/tasks')).body.tasks[0].id, '2');
+});
+
+test('returns a safe committed record id when task creation succeeded before readback failed', async () => {
+  const mismatch = Object.assign(new Error('mismatch'), { kind: 'verification_mismatch', code: 'READBACK_MISMATCH', committed: true, recordId: 'rec_committed' });
+  const api = createWorkbenchApi({
+    core: { async getOverview() { return {}; } },
+    tasks: { async getTasks() { return {}; }, async createTask() { throw mismatch; } },
+    targets: { async getTargets() { return {}; } },
+    timeline: { async getTimeline() { return {}; } },
+  });
+
+  assert.deepEqual(await api.handle('POST', '/api/workbench/tasks', { id: 'ou_1' }, { title: '已落表任务' }), {
+    status: 409,
+    body: { error: { kind: 'verification_mismatch', code: 'READBACK_MISMATCH', committed: true, recordId: 'rec_committed' } },
+  });
 });
 
 test('maps stale task choices and missing records to stable public diagnostics', async () => {
