@@ -659,29 +659,39 @@ const liveEnded=t=>liveTaskModel.isTaskComplete(t);
 const liveFiltered=()=>liveTaskModel.filterTasks(liveTasks(),{scope:liveViewerId()?liveTaskScope:'all',viewerId:liveViewerId(),completion:liveTaskCompletion,status:liveTaskStatus,ownerId:liveTaskOwner,section:liveTaskSection,search:liveTaskSearch});
 const liveOwnerNames=t=>t.responsiblePeople?.length?t.responsiblePeople.map(p=>esc(p.name)).join('、'):t.peopleStatus==='unresolved'?'人员待解析':'待分派';
 const liveCanWrite=()=>localAuth?.authenticated===true;
-function liveTaskEditor(task){
- const draft=liveTaskModel.createTaskEditDraft(task),statusOptions=[...new Set([...(liveData?.tasks?.statusOptions||[]),task.status].filter(Boolean))],ownerOptions=liveData?.tasks?.ownerOptions||[];
+function liveTaskEditor(task,preservedDraft=null){
+ const statusOptions=[...new Set([...(liveData?.tasks?.statusOptions||[]),task.status].filter(Boolean))],ownerOptions=liveData?.tasks?.ownerOptions||[],draft=liveTaskModel.reconcileTaskEditDraft(task,preservedDraft,statusOptions,ownerOptions);
  const readonly=`<div class="live-task-readonly"><div><small>任务标题</small><b>${esc(task.title)}</b></div><div><small>板块</small><span>${esc(task.section||'未分组')}</span></div><div><small>事项分类</small><span>${esc(task.category||'未设置')}</span></div><div><small>子分组</small><span>${esc(task.subgroup||'未设置')}</span></div><div class="wide"><small>备注</small><span>${esc(task.notes||'无备注')}</span></div><div class="wide"><small>多维表记录 ID</small><span class="mono">${esc(task.id)}</span></div></div>`;
  const editor=liveCanWrite()?`<form id="liveTaskEditForm"><div class="field"><label for="liveTaskEditStatus">状态</label><select id="liveTaskEditStatus">${statusOptions.map(value=>`<option value="${esc(value)}" ${value===draft.status?'selected':''}>${esc(value)}</option>`).join('')}</select></div><div class="field"><label>负责人</label><div class="v9-user-options live-task-owners">${ownerOptions.map(person=>`<label><input type="checkbox" name="liveTaskResponsible" value="${esc(person.id)}" ${draft.responsibleOpenIds.includes(person.id)?'checked':''}><span>${esc(person.name)}</span></label>`).join('')||'<span class="meta">任务表中没有可用负责人候选。</span>'}</div><small>候选人来自当前任务表中已经出现过的负责人。</small></div></form>`:notice('当前为只读查看。使用飞书登录后才能修改状态和负责人。','amber');
  const foot=btn('取消','close-modal')+(liveCanWrite()?'<button class="btn primary" data-live-act="task-save" data-record-id="'+esc(task.id)+'" disabled>保存修改</button>':'<button class="btn primary" data-live-act="feishu-login">使用飞书登录</button>');
  openModal('任务详情与更新',readonly+editor,foot,true);
+ syncLiveTaskSaveState(task);
 }
-function liveTaskFormPatch(task){
+function liveTaskFormDraft(){
  const status=$('#liveTaskEditStatus')?.value||'',responsibleOpenIds=[...document.querySelectorAll('input[name="liveTaskResponsible"]:checked')].map(input=>input.value);
- return liveTaskModel.buildTaskPatch(task,{status,responsibleOpenIds});
+ return {status,responsibleOpenIds};
 }
+function liveTaskFormPatch(task){return liveTaskModel.buildTaskPatch(task,liveTaskFormDraft());}
 function syncLiveTaskSaveState(task){
  const button=$('[data-live-act="task-save"]');
  if(button)button.disabled=liveTaskSaving||!liveTaskFormPatch(task);
 }
 async function saveLiveTask(task){
  if(liveTaskSaving||!liveCanWrite())return;
- const patch=liveTaskFormPatch(task);
+ const draft=liveTaskFormDraft(),patch=liveTaskModel.buildTaskPatch(task,draft);
  if(!patch){modalError('没有需要保存的修改。');return;}
- liveTaskSaving=true;const button=$('[data-live-act="task-save"]');if(button){button.disabled=true;button.textContent='正在同步…';}
+ liveTaskSaving=true;let activeTask=task;const button=$('[data-live-act="task-save"]');if(button){button.disabled=true;button.textContent='正在同步…';}
  try{const result=await window.__hmWrite('tasks','PATCH',task.id,patch);if(result?.syncStatus!=='verified')throw new Error('写入结果尚未通过复读验证');closeModal();toast(`任务已同步：${result.task.status} · ${liveOwnerNames(result.task)}`);}
- catch(error){modalError(error?.message||'任务更新失败，请稍后重试。');}
- finally{liveTaskSaving=false;const current=$('[data-live-act="task-save"]');if(current){current.textContent='保存修改';syncLiveTaskSaveState(task);}}
+ catch(error){
+  if(['STALE_STATUS','STALE_OWNER','RECORD_NOT_FOUND'].includes(error?.code)){
+   if(error.refreshStatus==='failed'){modalError(error.message);return;}
+   const refreshedTask=liveTasks().find(item=>item.id===task.id);
+   if(!refreshedTask){closeModal();toast('该任务记录已不存在，任务列表已刷新',true);return;}
+   activeTask=refreshedTask;liveTaskEditor(refreshedTask,draft);modalError(error.message);return;
+  }
+  modalError(error?.message||'任务更新失败，请稍后重试。');
+ }
+ finally{liveTaskSaving=false;const current=$('[data-live-act="task-save"]');if(current){current.textContent='保存修改';syncLiveTaskSaveState(activeTask);}}
 }
 const liveCategoryRows=()=>liveData?.categories?.rows||[];
 const liveFirstCategories=()=>[...new Set(liveCategoryRows().map(x=>x.category))].sort((a,b)=>a.localeCompare(b,'zh-CN'));

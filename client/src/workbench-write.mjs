@@ -17,12 +17,22 @@ export function createWorkbenchWriter({ baseUrl, fetchImpl = fetch, refresh }) {
         STALE_OWNER: '负责人候选已更新，请重新选择后保存',
         RECORD_NOT_FOUND: '该任务记录已不存在，请刷新任务列表',
       };
-      if (code && staleMessages[code]) await refresh().catch(() => {});
-      const message = typeof error === 'string' ? error
+      let refreshStatus = 'not_attempted';
+      if (code && staleMessages[code]) {
+        try {
+          await refresh();
+          refreshStatus = 'succeeded';
+        } catch {
+          refreshStatus = 'failed';
+        }
+      }
+      const baseMessage = typeof error === 'string' ? error
         : response.status === 401 ? '请先登录'
           : staleMessages[code] ?? `操作失败（${code ?? response.status}）`;
+      const message = refreshStatus === 'failed' ? `${baseMessage}；任务列表刷新失败，请刷新页面后重试` : baseMessage;
       const failure = new Error(message);
       failure.code = code;
+      failure.refreshStatus = refreshStatus;
       throw failure;
     }
     try {

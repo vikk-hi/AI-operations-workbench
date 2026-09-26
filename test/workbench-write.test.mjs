@@ -71,6 +71,29 @@ test('refreshes stale task choices before reporting a specific update error', as
     refresh: async () => { refreshes += 1; },
   });
 
-  await assert.rejects(writer('tasks', 'PATCH', 'rec_1', { status: '旧状态' }), /状态选项已更新/);
+  await assert.rejects(writer('tasks', 'PATCH', 'rec_1', { status: '旧状态' }), (error) => {
+    assert.match(error.message, /状态选项已更新/);
+    assert.equal(error.code, 'STALE_STATUS');
+    assert.equal(error.refreshStatus, 'succeeded');
+    return true;
+  });
   assert.equal(refreshes, 1);
+});
+
+test('reports when stale task choices cannot be refreshed', async () => {
+  const writer = createWorkbenchWriter({
+    baseUrl: 'http://127.0.0.1:3001',
+    fetchImpl: async () => ({
+      ok: false, status: 409,
+      async json() { return { error: { kind: 'invalid_task_update', code: 'STALE_OWNER' } }; },
+    }),
+    refresh: async () => { throw new Error('refresh failed'); },
+  });
+
+  await assert.rejects(writer('tasks', 'PATCH', 'rec_1', { responsibleOpenIds: ['ou_old'] }), (error) => {
+    assert.match(error.message, /负责人候选已更新.*刷新失败/);
+    assert.equal(error.code, 'STALE_OWNER');
+    assert.equal(error.refreshStatus, 'failed');
+    return true;
+  });
 });

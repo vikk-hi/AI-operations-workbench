@@ -27,6 +27,9 @@ test('normalizes D11 timeline dates, owners, completion and one selected target'
   ];
   const repository = createTimelineRepository({ source: { key: 'timeline', appToken: 'base', tableId: 'table' }, client: { async listFields() { return fields; }, async listAllRecords() { return records; } } });
   const result = await repository.getTimeline();
+  assert.equal(result.readOnly, true);
+  assert.equal(result.writable, false);
+  assert.equal(result.readStatus.mode, 'live-readonly');
   assert.equal(result.rows.length, 2);
   assert.equal(result.rows.filter((item) => item.selectedForTest).length, 1);
   assert.equal(result.rows[0].recordId, 'r1');

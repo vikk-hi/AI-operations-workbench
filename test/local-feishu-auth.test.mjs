@@ -83,6 +83,8 @@ test('live task adapter exposes verified editing without create, delete, or time
   assert.doesNotMatch(adapter, /live-task-create|task-delete|live-timeline-create|timeline-toggle|timeline-delete/);
   assert.doesNotMatch(adapter, /window\.prompt/);
   assert.match(adapter, /data-live-act="task-save"[^>]*disabled/);
+  assert.match(adapter, /reconcileTaskEditDraft/);
+  assert.match(adapter, /refreshStatus==='failed'/);
 });
 
 test('combined local launcher binds the client to the documented IPv4 address', async () => {

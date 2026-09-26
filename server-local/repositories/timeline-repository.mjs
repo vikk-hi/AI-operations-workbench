@@ -63,10 +63,10 @@ export function createTimelineRepository({ client, source, now = () => new Date(
       });
       return {
         source: `https://qingmutec.feishu.cn/base/${source.appToken}?table=${source.tableId}`,
-        readOnly: false,
-        writable: true,
+        readOnly: true,
+        writable: false,
         rows,
-        readStatus: { sourceKey: source.key, mode: 'live-readwrite', lastReadAt: now().toISOString(), recordCount: records.length, cached: false },
+        readStatus: { sourceKey: source.key, mode: 'live-readonly', lastReadAt: now().toISOString(), recordCount: records.length, cached: false },
       };
     },
     async createTimelineItem(input) {

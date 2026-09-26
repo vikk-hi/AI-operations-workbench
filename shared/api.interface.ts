@@ -71,7 +71,7 @@ export interface DataSourceSummary {
   label: string;
   baseUrl: string;
   tableName: string;
-  mode: 'continuous-sync' | 'demo';
+  mode: 'continuous-sync' | 'read-write' | 'demo';
   readOnlyOriginal: boolean;
 }
 

@@ -6,6 +6,7 @@ import {
   createTaskEditDraft,
   filterTasks,
   isTaskComplete,
+  reconcileTaskEditDraft,
   taskFilterOptions,
 } from '../client/src/live-task-model.mjs';
 
@@ -51,4 +52,23 @@ test('creates an edit draft and emits only changed task fields', () => {
     responsibleOpenIds: ['ou_me', 'ou_other'],
   });
   assert.deepEqual(buildTaskPatch(original, { ...draft, responsibleOpenIds: [] }), { responsibleOpenIds: [] });
+});
+
+test('reconciles a preserved edit draft against refreshed task choices', () => {
+  const refreshed = { ...tasks[0], status: '进行中', responsiblePeople: [{ id: 'ou_other', name: '运营乙' }] };
+  const statuses = ['待处理', '进行中', '已完成'];
+  const owners = [{ id: 'ou_me', name: '运营甲' }, { id: 'ou_other', name: '运营乙' }];
+
+  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '待处理', responsibleOpenIds: ['ou_me'] }, statuses, owners), {
+    status: '待处理', responsibleOpenIds: ['ou_me'],
+  });
+  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '旧状态', responsibleOpenIds: ['ou_missing'] }, statuses, owners), {
+    status: '进行中', responsibleOpenIds: ['ou_other'],
+  });
+  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '进行中', responsibleOpenIds: ['ou_missing', 'ou_me'] }, statuses, owners), {
+    status: '进行中', responsibleOpenIds: ['ou_me'],
+  });
+  assert.deepEqual(reconcileTaskEditDraft(refreshed, { status: '进行中', responsibleOpenIds: [] }, statuses, owners), {
+    status: '进行中', responsibleOpenIds: [],
+  });
 });

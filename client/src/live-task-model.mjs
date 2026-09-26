@@ -43,6 +43,19 @@ export function createTaskEditDraft(task) {
   };
 }
 
+export function reconcileTaskEditDraft(task, preservedDraft, statusOptions, ownerOptions) {
+  const current = createTaskEditDraft(task);
+  if (!preservedDraft) return current;
+  const allowedStatuses = new Set((statusOptions ?? []).map(clean).filter(Boolean));
+  const allowedOwnerIds = new Set((ownerOptions ?? []).map((person) => clean(person?.id)).filter(Boolean));
+  const preservedOwnerIds = stableIds(Array.isArray(preservedDraft.responsibleOpenIds) ? preservedDraft.responsibleOpenIds : []);
+  const validOwnerIds = preservedOwnerIds.filter((id) => allowedOwnerIds.has(id));
+  return {
+    status: allowedStatuses.has(clean(preservedDraft.status)) ? clean(preservedDraft.status) : current.status,
+    responsibleOpenIds: preservedOwnerIds.length > 0 && validOwnerIds.length === 0 ? current.responsibleOpenIds : validOwnerIds,
+  };
+}
+
 export function buildTaskPatch(originalTask, draft) {
   const patch = {};
   const originalStatus = clean(originalTask?.status);
@@ -55,5 +68,5 @@ export function buildTaskPatch(originalTask, draft) {
 }
 
 if (typeof window !== 'undefined') {
-  window.__hmTaskModel = Object.freeze({ isTaskComplete, filterTasks, taskFilterOptions, createTaskEditDraft, buildTaskPatch });
+  window.__hmTaskModel = Object.freeze({ isTaskComplete, filterTasks, taskFilterOptions, createTaskEditDraft, reconcileTaskEditDraft, buildTaskPatch });
 }
