@@ -9,6 +9,9 @@ build/
 */build/
 
 # Environment files
+.env
+.env.*
+!.env.example
 .env.local
 
 # Logs
@@ -17,6 +20,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 /logs/
+*.log
 
 # Runtime data
 pids
@@ -48,6 +52,11 @@ Thumbs.db
 tmp/
 temp/
 .playwright-cli/
+work/
+
+# Local browser and session data
+*.cookie.json
+cookies.json
 
 # Lock files (keep package-lock.json for consistent installs)
 yarn.lock
